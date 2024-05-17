@@ -1,4 +1,8 @@
 const pool = require('../config/db');
+jwt = require('jsonwebtoken');
+require('dotenv').config();
+bcrypt = require('bcrypt');
+
 
 exports.createUser = async (name, email, password) => {
     const [result] = await pool.query(
@@ -37,4 +41,20 @@ exports.getUserByName = async (name) => {
     const [rows] = await pool.query('SELECT * FROM users WHERE name = ?', [name]);
     return rows[0];
 }
+
+exports.verifyPassword = async (password, hashedPassword) => {
+    return await bcrypt.compare(password, hashedPassword);
+}
+
+exports.signToken = (id, name, email) => {
+    return jwt.sign({ id, name, email }, process.env.JWT_SECRET, {
+        expiresIn: '30d',
+    });
+}
+
+exports.hashPassword = async (password) => {
+    const saltRounds = 10;
+    return await bcrypt.hash(password, saltRounds);
+};
+
 
