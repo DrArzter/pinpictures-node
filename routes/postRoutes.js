@@ -5,10 +5,12 @@ const authMiddleware = require('../middlewares/authMiddleware');
 const multer = require('multer');
 
 const uploadPost = multer({ dest: 'uploads/posts' });
+const uploadUser = multer({ dest: 'uploads/users' });
 
 router.get('/', postController.getAllPosts);
-router.post('/', uploadPost.single('image'), authMiddleware, postController.createPost);
-
-// Дополнительные маршруты для получения, обновления и удаления постов
+router.post('/', authMiddleware, uploadPost.single('picpath'), postController.createPost);
+router.get('/:id', postController.getPostById);
+router.delete('/:id', authMiddleware, postController.deletePost);
+router.put('/rating/:id', authMiddleware, postController.updateRating);
 
 module.exports = router;

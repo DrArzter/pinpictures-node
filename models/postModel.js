@@ -37,3 +37,23 @@ exports.createPost = async (post) => {
     return result.insertId;
 };
 
+exports.getPostById = async (id) => {
+    const [rows] = await pool.query('SELECT * FROM posts WHERE id = ?', [id]);
+    return rows[0];
+};
+
+exports.deletePost = async (id) => {
+    const [result] = await pool.query('DELETE FROM posts WHERE id = ?', [id]);
+    return result.affectedRows;
+};
+
+exports.updatePost = async (id, post) => {
+    const [result] = await pool.query('UPDATE posts SET ? WHERE id = ?', [post, id]);
+    return result.affectedRows;
+};
+
+exports.updateRating = async (id, rating) => {
+    const [result] = await pool.query('UPDATE posts SET rating = ? WHERE id = ?', [rating, id]);
+    return result.affectedRows;
+};
+
