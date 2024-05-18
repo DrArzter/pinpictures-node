@@ -6,7 +6,6 @@ exports.getAllPosts = async () => {
             p.id, 
             p.name, 
             p.description, 
-            p.cost, 
             p.rating, 
             p.picpath, 
             u.name AS author, 

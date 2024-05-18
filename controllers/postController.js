@@ -1,4 +1,9 @@
 const Post = require('../models/postModel');
+const jwt = require('jsonwebtoken');
+const { env } = require('process');
+const fs = require('fs');
+const jwtSecretKey = env.JWT_SECRET;
+
 
 exports.getAllPosts = async (req, res) => {
     try {
@@ -12,29 +17,23 @@ exports.getAllPosts = async (req, res) => {
 exports.createPost = async (req, res) => {
     const formData = req.body;
     const image = req.file;
-    const token = req.headers.authorization;
-
-    if (!token) {
-        return res.status(401).json({ status: 'error', message: 'Unauthorized' });
-    }
-
-    try {
-        const { id } = jwt.verify(token, jwtSecretKey);
-        formData.authorid = id;
-    } catch (error) {
-        return res.status(401).json({ status: 'error', message: 'Unauthorized' });
-    }
+    const authHeader = req.headers.authorization;
+    const token = authHeader.split(' ')[1];
+    const decoded = jwt.verify(token, jwtSecretKey);
+    formData.authorid = decoded.id;
 
     if (formData && image) {
-        const post = {
-            name: formData.name,
-            description: formData.description,
-            cost: formData.cost,
-            authorid: formData.authorid,
-            picpath: image.filename
-        };
-
+        const fileExt = image.originalname.split('.').pop();
+        const tempPath = image.path;
+        const newPath = image.path + '.png';
         try {
+            fs.renameSync(tempPath, newPath); 
+            const post = {
+                name: formData.name,
+                description: formData.description,
+                authorid: formData.authorid,
+                picpath: 'uploads/posts/' + image.filename + '.png'
+            };
             const newPostId = await Post.createPost(post);
             res.status(201).json({ id: newPostId, ...post });
         } catch (err) {
