@@ -21,7 +21,8 @@ CREATE TABLE IF NOT EXISTS comments (
   id INT AUTO_INCREMENT PRIMARY KEY,
     authorid INT NOT NULL,
     postid INT NOT NULL, 
-    content VARCHAR(255) NOT NULL
+    comment VARCHAR(255) NOT NULL,
+    picpath VARCHAR(255)
     );
     
 CREATE TABLE IF NOT EXISTS likes (
@@ -29,5 +30,4 @@ CREATE TABLE IF NOT EXISTS likes (
     authorid INT,
     postid int
     );
-    
     

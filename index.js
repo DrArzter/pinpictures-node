@@ -4,6 +4,7 @@ const dotenv = require('dotenv');
 
 const postRoutes = require('./routes/postRoutes');
 const userRoutes = require('./routes/userRoutes');
+const commentRoutes = require('./routes/commentRoutes');
 
 dotenv.config();
 
@@ -11,6 +12,8 @@ const app = express();
 
 app.use('/uploads/posts', express.static('uploads/posts'));
 app.use('/uploads/users', express.static('uploads/users'));
+app.use('/uploads/comments', express.static('uploads/comments'));
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors(
@@ -21,6 +24,7 @@ app.use(cors(
 
 app.use('/api/posts', postRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/comments', commentRoutes);
 
 
 const port = process.env.PORT || 3000;

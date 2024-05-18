@@ -14,7 +14,7 @@ exports.getAllPosts = async () => {
                     JSON_OBJECT(
                         'id', c.id,
                         'author', u.name,
-                        'content', c.content
+                        'comment', c.comment
                     )
                 ) 
                 FROM comments c 

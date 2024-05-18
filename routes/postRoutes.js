@@ -5,7 +5,6 @@ const authMiddleware = require('../middlewares/authMiddleware');
 const multer = require('multer');
 
 const uploadPost = multer({ dest: 'uploads/posts' });
-const uploadUser = multer({ dest: 'uploads/users' });
 
 router.get('/', postController.getAllPosts);
 router.post('/', authMiddleware, uploadPost.single('image'), postController.createPost);

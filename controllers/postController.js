@@ -1,8 +1,7 @@
 const Post = require('../models/postModel');
-const jwt = require('jsonwebtoken');
 const { env } = require('process');
 const fs = require('fs');
-const jwtSecretKey = env.JWT_SECRET;
+const checkToken = require('../utils/getIdbyToken');
 
 
 exports.getAllPosts = async (req, res) => {
@@ -17,10 +16,7 @@ exports.getAllPosts = async (req, res) => {
 exports.createPost = async (req, res) => {
     const formData = req.body;
     const image = req.file;
-    const authHeader = req.headers.authorization;
-    const token = authHeader.split(' ')[1];
-    const decoded = jwt.verify(token, jwtSecretKey);
-    formData.authorid = decoded.id;
+    formData.authorid = await checkToken(req.headers.authorization);
 
     if (formData && image) {
         const fileExt = image.originalname.split('.').pop();
