@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken');
-const jwtSecretKey = 'mysecretkey';
+const { env } = require('process');
+const jwtSecretKey = env.JWT_SECRET;
 
 module.exports = (req, res, next) => {
     const authHeader = req.headers.authorization;
@@ -19,6 +20,6 @@ module.exports = (req, res, next) => {
         req.user = decoded;
         next();
     } catch (error) {
-        return res.status(401).json({ status: 'error', message: 'Unauthorized' });
+        return res.status(401);
     }
 };
