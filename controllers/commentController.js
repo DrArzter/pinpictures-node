@@ -1,7 +1,7 @@
 const Comment = require('../models/commentModel');
 const jwt = require('jsonwebtoken');
 const { env } = require('process');
-const checkToken = require('../utils/getIdbyToken');
+const getIdbyToken = require('../utils/getIdbyToken');
 
 exports.getAllComments = async (req, res) => {
     const [rows] = await Comment.getAllComments();
@@ -11,8 +11,7 @@ exports.getAllComments = async (req, res) => {
 exports.createComment = async (req, res) => {
     try {
         const { postid, comment } = req.body;
-        const authorid = await checkToken(req.headers.authorization);
-        console.log(authorid);
+        const authorid = await getIdbyToken(req.headers.authorization);
         const newComment = { authorid, postid, comment, picpath: null };
         const result = await Comment.createComment(newComment);
         res.status(201).json({ id: result.insertId, ...newComment });

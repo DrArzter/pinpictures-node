@@ -5,6 +5,7 @@ const dotenv = require('dotenv');
 const postRoutes = require('./routes/postRoutes');
 const userRoutes = require('./routes/userRoutes');
 const commentRoutes = require('./routes/commentRoutes');
+const chatRoutes = require('./routes/chatRoutes');
 
 dotenv.config();
 
@@ -25,6 +26,7 @@ app.use(cors(
 app.use('/api/posts', postRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/comments', commentRoutes);
+app.use('/api/chats', chatRoutes);
 
 
 const port = process.env.PORT || 3000;

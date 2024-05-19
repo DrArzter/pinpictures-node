@@ -47,7 +47,6 @@ exports.getUserByName = async (name) => {
     }
 };
 
-
 exports.verifyPassword = async (password, hashedPassword) => {
     return await bcrypt.compare(password, hashedPassword);
 }

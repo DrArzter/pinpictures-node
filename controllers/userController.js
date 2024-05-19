@@ -34,7 +34,7 @@ exports.login = async (req, res) => {
 };
 
 exports.getUser = async (req, res) => {
-    res.status(200).json({ id: req.user.id, name: req.user.name, email: req.user.email });
+    res.status(200).json({ id: req.user.id, name: req.user.name, email: req.user.email, picpath: req.user.picpath });
 };
 
 exports.getUserById = async (req, res) => {
@@ -46,5 +46,5 @@ exports.getUserById = async (req, res) => {
 exports.getUserByName = async (req, res) => {
     const { name } = req.params;
     const [rows] = await User.getUserByName(name);
-    res.json({ id: rows.id, name: rows.name, email: rows.email });
+    res.json({ id: rows.id, name: rows.name, email: rows.email, picpath: rows.picpath });
 };
