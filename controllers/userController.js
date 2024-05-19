@@ -18,7 +18,7 @@ exports.register = async (req, res) => {
 exports.login = async (req, res) => {
     const { name, password } = req.body;
     try {
-        const user = await User.getUserByName(name);
+        const user = (await User.getUserByName(name))[0];
         if (!user) {
             throw new Error('User not found');
         }
@@ -46,5 +46,5 @@ exports.getUserById = async (req, res) => {
 exports.getUserByName = async (req, res) => {
     const { name } = req.params;
     const [rows] = await User.getUserByName(name);
-    res.json(rows);
+    res.json({ id: rows.id, name: rows.name, email: rows.email });
 };
