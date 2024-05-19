@@ -34,7 +34,9 @@ exports.login = async (req, res) => {
 };
 
 exports.getUser = async (req, res) => {
-    res.status(200).json({ id: req.user.id, name: req.user.name, email: req.user.email, picpath: req.user.picpath });
+    const id = req.user.id;
+    const user = await User.getUserById(id);
+    res.json(user);
 };
 
 exports.getUserById = async (req, res) => {
