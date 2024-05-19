@@ -36,3 +36,15 @@ exports.login = async (req, res) => {
 exports.getUser = async (req, res) => {
     res.status(200).json({ id: req.user.id, name: req.user.name, email: req.user.email });
 };
+
+exports.getUserById = async (req, res) => {
+    const { id } = req.params;
+    const [rows] = await User.getUserById(id);
+    res.json(rows);
+};
+
+exports.getUserByName = async (req, res) => {
+    const { name } = req.params;
+    const [rows] = await User.getUserByName(name);
+    res.json(rows);
+};

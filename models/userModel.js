@@ -38,9 +38,15 @@ exports.deleteUser = async (id) => {
 }
 
 exports.getUserByName = async (name) => {
-    const [rows] = await pool.query('SELECT * FROM users WHERE name = ?', [name]);
-    return rows[0];
-}
+    try {
+        const result = await pool.query('SELECT * FROM users WHERE name = ?', [name]);
+        return result[0];
+    } catch (error) {
+        console.error("Error in getUserByName:", error);
+        throw error;
+    }
+};
+
 
 exports.verifyPassword = async (password, hashedPassword) => {
     return await bcrypt.compare(password, hashedPassword);
