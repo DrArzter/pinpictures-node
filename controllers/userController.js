@@ -1,6 +1,4 @@
 const User = require('../models/userModel');
-const jwt = require('jsonwebtoken');
-const { env } = require('process');
 
 exports.register = async (req, res) => {
     const { name, email, password } = req.body;
@@ -8,8 +6,8 @@ exports.register = async (req, res) => {
         const hashedPassword = await User.hashPassword(password);
         const user = await User.createUser(name, email, hashedPassword);
         const token = User.signToken(user.id, user.name, user.email);
-        const response = await User.getUserById(user);
-        res.status(201).json({ id: response.id, name: response.name, email: response.email, token });
+        const response = await User.getUserById(user.id); // Передаем user.id вместо user
+        res.status(201).json({ id: response.id, name: response.name, email: response.email, picpath: response.picpath, token });
     } catch (err) {
         res.status(400).json({ message: err.message });
     }
@@ -27,7 +25,7 @@ exports.login = async (req, res) => {
             throw new Error('Invalid password');
         }
         const token = User.signToken(user.id, user.name, user.email);
-        res.status(200).json({ id: user.id, name: user.name, email: user.email, token });
+        res.status(200).json({ id: user.id, name: user.name, email: user.email, picpath: user.picpath, token });
     } catch (err) {
         res.status(401).json({ message: err.message });
     }
@@ -35,18 +33,41 @@ exports.login = async (req, res) => {
 
 exports.getUser = async (req, res) => {
     const id = req.user.id;
-    const user = await User.getUserById(id);
-    res.json(user);
+    try {
+        const user = await User.getUserById(id);
+        if (!user) {
+            res.status(404).json({ error: 'User not found' });
+        } else {
+            res.json(user);
+        }
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
 };
 
 exports.getUserById = async (req, res) => {
     const { id } = req.params;
-    const [rows] = await User.getUserById(id);
-    res.json(rows);
+    try {
+        const user = await User.getUserById(id);
+        if (!user) {
+            res.status(404).json({ error: 'User not found' });
+        } else {
+            res.json(user);
+        }
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
 };
 
 exports.getUserByName = async (req, res) => {
     const { name } = req.params;
-    const [rows] = await User.getUserByName(name);
-    res.json({ id: rows.id, name: rows.name, email: rows.email, picpath: rows.picpath });
+    try {
+        const user = await User.getUserByName(name);
+        res.json(user[0]);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
 };

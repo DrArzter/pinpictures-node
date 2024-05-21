@@ -9,7 +9,7 @@ const uploadUser = multer({ dest: 'uploads/posts' });
 router.post('/register', userController.register);
 router.post('/login', userController.login);
 router.get('/', authMiddleware, userController.getUser);
-router.get('/:name', userController.getUserByName);
-router.get('/:id', userController.getUserById);
+router.get('/by-id/:id', userController.getUserById);
+router.get('/by-name/:name', userController.getUserByName);
 
 module.exports = router;

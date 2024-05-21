@@ -17,9 +17,15 @@ exports.getUserByEmail = async (email) => {
     return rows[0];
 }
 
+
 exports.getUserById = async (id) => {
     const [rows] = await pool.query('SELECT * FROM users WHERE id = ?', [id]);
-    return rows[0];
+    return rows;
+};
+
+exports.getUserByName = async (name) => {
+    const [rows] = await pool.query('SELECT * FROM users WHERE name = ?', [name]);
+    return rows;
 }
 
 exports.getAllUsers = async () => {
@@ -36,16 +42,6 @@ exports.deleteUser = async (id) => {
     const [result] = await pool.query('DELETE FROM users WHERE id = ?', [id]);
     return result.affectedRows;
 }
-
-exports.getUserByName = async (name) => {
-    try {
-        const result = await pool.query('SELECT * FROM users WHERE name = ?', [name]);
-        return result[0];
-    } catch (error) {
-        console.error("Error in getUserByName:", error);
-        throw error;
-    }
-};
 
 exports.verifyPassword = async (password, hashedPassword) => {
     return await bcrypt.compare(password, hashedPassword);
