@@ -47,7 +47,6 @@ exports.uploadMessage = async (req, res) => {
             return;
         } else {
             response = await Chat.getChatById(chatId);
-            console.log(response);
             res.status(200).json(response);
         }
     } catch (error) {
