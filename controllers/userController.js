@@ -5,9 +5,9 @@ exports.register = async (req, res) => {
     try {
         const hashedPassword = await User.hashPassword(password);
         const user = await User.createUser(name, email, hashedPassword);
-        const token = User.signToken(user.id, user.name, user.email);
-        const response = await User.getUserById(user.id); // Передаем user.id вместо user
-        res.status(201).json({ id: response.id, name: response.name, email: response.email, picpath: response.picpath, token });
+        const token = User.signToken(user, name, email);
+        const response = await User.getUserById(user); 
+        res.status(201).json({ id: response[0].id, name: response[0].name, email: response[0].email, picpath: response[0].picpath, token });
     } catch (err) {
         res.status(400).json({ message: err.message });
     }
