@@ -30,8 +30,13 @@ app.use('/api/chats', chatRoutes);
 
 
 const port = process.env.PORT || 3000;
+const host = process.env.HOST || '0.0.0.0';
 
-app.listen(port, () => {
-    console.log(`Server is running on port ${port}`);
+app.get('/', (req, res) => {
+    res.send('Hello, world!');
+});
+
+app.listen(port, host, () => {
+    console.log(`Server is running on ${host}:${port}`);
     console.log('Connected to database with host: ' + process.env.DB_HOST + ', user: ' + process.env.DB_USER + ', database: ' + process.env.DB_NAME);
 });
