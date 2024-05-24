@@ -6,8 +6,8 @@ bcrypt = require('bcrypt');
 
 exports.createUser = async (name, email, password) => {
     const [result] = await pool.query(
-        'INSERT INTO users (name, email, password) VALUES (?, ?, ?)',
-        [name, email, password]
+        'INSERT INTO users (name, email, password, picpath) VALUES (?, ?, ?, ?)',
+        [name, email, password, "https://ui-avatars.com/api/?name=" + name + "&color=121212&background=D1D5DB"]
     );
     return result.insertId;
 }
@@ -16,7 +16,6 @@ exports.getUserByEmail = async (email) => {
     const [rows] = await pool.query('SELECT * FROM users WHERE email = ?', [email]);
     return rows[0];
 }
-
 
 exports.getUserById = async (id) => {
     const [rows] = await pool.query('SELECT * FROM users WHERE id = ?', [id]);
