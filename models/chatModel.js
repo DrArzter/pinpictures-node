@@ -6,8 +6,15 @@ exports.getChatsByUserIdFromDb = async (userId) => {
             c.id AS chatId,
             c.picpath,
             (
-                SELECT JSON_ARRAYAGG(u.name) 
-                FROM users u 
+                SELECT JSON_ARRAYAGG(
+                    JSON_OBJECT(
+                        'name', u.name, 
+                        'picpath', u.picpath, 
+                        'id', u.id
+                    )
+                )
+                FROM users u
+                JOIN users_in_chats uic ON u.id = uic.userid
                 WHERE uic.chatid = c.id
             ) AS users,
             (
@@ -29,6 +36,7 @@ exports.getChatsByUserIdFromDb = async (userId) => {
     const [rows] = await pool.query(query, [userId]);
     return rows;
 };
+
 
 exports.getMessagesByTimestamp = async (userId, chatId, timestamp) => {
     const query = `

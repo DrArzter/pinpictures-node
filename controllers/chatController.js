@@ -20,7 +20,7 @@ exports.getChatsByUserId = async (req, res) => {
 exports.createChat = async (req, res) => {
     try {
         const user1 = await getIdbyToken(req.headers.authorization);
-        const user2 = req.body;
+        const user2 = req.body.secondUserId;
 
         const chatId = await Chat.createChat({ user1, user2 });
         res.status(201).json({ chatId });
