@@ -37,7 +37,37 @@ exports.createPost = async (post) => {
 };
 
 exports.getPostById = async (id) => {
-    const [rows] = await pool.query('SELECT * FROM posts WHERE id = ?', [id]);
+    const [rows] = await pool.query(`
+        SELECT 
+            p.id, 
+            p.name, 
+            p.description, 
+            p.rating, 
+            p.picpath, 
+            u.name AS author, 
+            (
+                SELECT JSON_ARRAYAGG(
+                    JSON_OBJECT(
+                        'id', c.id,
+                        'author', u.name,
+                        'comment', c.comment
+                    )
+                ) 
+                FROM comments c 
+                JOIN users u ON c.authorid = u.id
+                WHERE c.postid = p.id
+            ) AS comments
+        FROM 
+            posts p 
+        JOIN 
+            users u ON p.authorid = u.id 
+        WHERE
+            p.id = ?
+        GROUP BY 
+            p.id
+        ORDER BY 
+            p.id DESC
+    `, [id]);
     return rows[0];
 };
 

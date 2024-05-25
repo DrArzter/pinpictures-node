@@ -29,7 +29,8 @@ exports.createPost = async (req, res) => {
                 picpath: newPath
             };
             const newPostId = await Post.createPost(post);
-            res.status(201).json({ id: newPostId, ...post });
+            const newPost = await Post.getPostById(newPostId);
+            res.status(201).json(newPost);
         } catch (err) {
             res.status(400).json({ message: err.message });
         }
