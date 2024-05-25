@@ -1,4 +1,7 @@
 const User = require('../models/userModel');
+const fs = require('fs');
+const path = require('path');
+const getIdbyToken = require('../utils/getIdbyToken');
 
 exports.register = async (req, res) => {
     const { name, email, password } = req.body;
@@ -66,6 +69,26 @@ exports.getUserByName = async (req, res) => {
     try {
         const user = await User.getUserByName(name);
         res.json(user[0]);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+};
+
+exports.uploadProfileImage = async (req, res) => {
+    const image = req.file;
+    const userId = getIdbyToken(req.headers.authorization);
+    if (!image) {
+        return res.status(400).json({ error: 'No image file provided' });
+    }
+    try {
+        const fileExtension = path.extname(image.originalname);
+        const tempPath = image.path;
+        const newPath = `${tempPath}${fileExtension}`;
+        fs.renameSync(tempPath, newPath);
+        const uploadImage = await User.updateProfileImage(userId, newPath);
+        const updatedUser = await User.getUserById(userId);
+        res.json(updatedUser[0]);
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Internal server error' });

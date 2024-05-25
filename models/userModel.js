@@ -57,4 +57,10 @@ exports.hashPassword = async (password) => {
     return await bcrypt.hash(password, saltRounds);
 };
 
+exports.updateProfileImage = async (id, imagePath) => {
+    const [result] = await pool.query('UPDATE users SET picpath = ? WHERE id = ?', [imagePath, id]);
+    return result
+};
+
+
 

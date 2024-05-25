@@ -3,7 +3,6 @@ const { env } = require('process');
 const fs = require('fs');
 const checkToken = require('../utils/getIdbyToken');
 
-
 exports.getAllPosts = async (req, res) => {
     try {
         const posts = await Post.getAllPosts();
@@ -17,18 +16,17 @@ exports.createPost = async (req, res) => {
     const formData = req.body;
     const image = req.file;
     formData.authorid = await checkToken(req.headers.authorization);
-
     if (formData && image) {
         const fileExt = image.originalname.split('.').pop();
         const tempPath = image.path;
-        const newPath = image.path + '.png';
+        const newPath = image.path + '.' + fileExt;
         try {
             fs.renameSync(tempPath, newPath); 
             const post = {
                 name: formData.name,
                 description: formData.description,
                 authorid: formData.authorid,
-                picpath: 'uploads/posts/' + image.filename + '.png'
+                picpath: newPath
             };
             const newPostId = await Post.createPost(post);
             res.status(201).json({ id: newPostId, ...post });
@@ -93,5 +91,3 @@ exports.updateRating = async (req, res) => {
         res.status(500).json({ message: err.message });
     }
 };
-
-// Дополнительные методы для получения, обновления и удаления постов
