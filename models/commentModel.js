@@ -2,7 +2,7 @@ const pool = require('../config/db');
 
 exports.createComment = async (comment) => {
     const [result] = await pool.query('INSERT INTO comments SET ?', comment);
-    return result.insertId;
+    return result;
 }
 
 exports.getCommentById = async (id) => {

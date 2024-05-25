@@ -14,7 +14,8 @@ exports.createComment = async (req, res) => {
         const authorid = await getIdbyToken(req.headers.authorization);
         const newComment = { authorid, postid, comment, picpath: null };
         const result = await Comment.createComment(newComment);
-        res.status(201).json({ id: result.insertId, ...newComment });
+        newComment.id = result.insertId;
+        res.status(201).json({ newComment });
     } catch (err) {
         res.status(500).json({ message: err.message });
     }
