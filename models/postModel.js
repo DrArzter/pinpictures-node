@@ -7,7 +7,6 @@ exports.getAllPosts = async () => {
             p.name, 
             p.description, 
             p.rating, 
-            p.picpath, 
             u.name AS author, 
             (
                 SELECT JSON_ARRAYAGG(
@@ -20,7 +19,17 @@ exports.getAllPosts = async () => {
                 FROM comments c 
                 JOIN users u ON c.authorid = u.id
                 WHERE c.postid = p.id
-            ) AS comments
+            ) AS comments,
+            (
+                SELECT JSON_ARRAYAGG(
+                    JSON_OBJECT(
+                        'id', i.id,
+                        'picpath', i.picpath
+                    )
+                )
+                FROM images_in_posts i
+                WHERE i.postid = p.id
+            ) AS images
         FROM 
             posts p 
         JOIN 
@@ -36,6 +45,10 @@ exports.createPost = async (post) => {
     return result.insertId;
 };
 
+exports.createImageInPost = async (image) => {
+    await pool.query('INSERT INTO images_in_posts SET ?', image);
+};
+
 exports.getPostById = async (id) => {
     const [rows] = await pool.query(`
         SELECT 
@@ -43,7 +56,6 @@ exports.getPostById = async (id) => {
             p.name, 
             p.description, 
             p.rating, 
-            p.picpath, 
             u.name AS author, 
             (
                 SELECT JSON_ARRAYAGG(
@@ -56,7 +68,17 @@ exports.getPostById = async (id) => {
                 FROM comments c 
                 JOIN users u ON c.authorid = u.id
                 WHERE c.postid = p.id
-            ) AS comments
+            ) AS comments,
+            (
+                SELECT JSON_ARRAYAGG(
+                    JSON_OBJECT(
+                        'id', i.id,
+                        'picpath', i.picpath
+                    )
+                )
+                FROM images_in_posts i
+                WHERE i.postid = p.id
+            ) AS images
         FROM 
             posts p 
         JOIN 

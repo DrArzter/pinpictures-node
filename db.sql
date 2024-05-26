@@ -16,7 +16,6 @@ CREATE TABLE IF NOT EXISTS posts (
     name VARCHAR(255) NOT NULL,
     description TEXT NOT NULL,
     rating INT CHECK (rating >= 1 AND rating <= 5),
-    picpath VARCHAR(255),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (authorid) REFERENCES users(id)
 );
