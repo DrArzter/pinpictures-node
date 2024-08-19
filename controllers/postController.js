@@ -3,6 +3,18 @@ const { env } = require('process');
 const fs = require('fs');
 const checkToken = require('../utils/getIdbyToken');
 
+
+exports.searchPosts = async (req, res) => {
+    try {
+        const { searchTerm } = req.query;
+        const posts = await Post.searchPosts(searchTerm);
+        res.json(posts);
+    } catch (error) {
+        console.error("Error searching posts:", error);
+        res.status(500).send("Server Error");
+    }
+};
+
 exports.getAllPosts = async (req, res) => {
     try {
         const posts = await Post.getAllPosts();

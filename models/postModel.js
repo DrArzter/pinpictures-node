@@ -108,3 +108,48 @@ exports.updateRating = async (id, rating) => {
     return result.affectedRows;
 };
 
+exports.searchPosts = async (searchTerm) => {
+    const query = `
+        SELECT 
+            p.id, 
+            p.name, 
+            p.description, 
+            p.rating, 
+            u.name AS author,
+            (
+                SELECT JSON_ARRAYAGG(
+                    JSON_OBJECT(
+                        'id', c.id,
+                        'author', u.name,
+                        'comment', c.comment
+                    )
+                ) 
+                FROM comments c 
+                JOIN users u ON c.authorid = u.id
+                WHERE c.postid = p.id
+            ) AS comments,
+            (
+                SELECT JSON_ARRAYAGG(
+                    JSON_OBJECT(
+                        'id', i.id,
+                        'picpath', i.picpath
+                    )
+                )
+                FROM images_in_posts i
+                WHERE i.postid = p.id
+            ) AS images
+        FROM 
+            posts p 
+        JOIN 
+            users u ON p.authorid = u.id 
+        WHERE
+            p.name LIKE ? OR
+            p.description LIKE ? OR
+            u.name LIKE ?
+        ORDER BY 
+            p.id DESC;
+    `;
+    const likeTerm = `%${searchTerm}%`;
+    const [rows] = await pool.query(query, [likeTerm, likeTerm, likeTerm]);
+    return rows;
+};

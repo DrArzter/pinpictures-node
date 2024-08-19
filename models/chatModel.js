@@ -114,3 +114,9 @@ exports.uploadMessage = async (userId, chatId, message) => {
         return null;
     }   
 };
+
+exports.isInChat = async (userId, chatId) => {
+    const query = 'SELECT * FROM users_in_chats WHERE userid = ? AND chatid = ?';
+    const [rows] = await pool.query(query, [userId, chatId]);
+    return rows.length > 0;
+}

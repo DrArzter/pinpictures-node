@@ -8,8 +8,13 @@ const uploadPost = multer({ dest: 'uploads/posts' });
 
 router.get('/', postController.getAllPosts);
 router.post('/', authMiddleware, uploadPost.array('images', 10), postController.createPost);
-router.get('/:id', postController.getPostById);
-router.delete('/:id', authMiddleware, postController.deletePost);
+
+router.get('/search', postController.searchPosts); 
+
+router.get('/id/:id', postController.getPostById);
+
+router.delete('/id/:id', authMiddleware, postController.deletePost);
+
 router.put('/rating/:id', authMiddleware, postController.updateRating);
 
 module.exports = router;
