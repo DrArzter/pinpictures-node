@@ -12,16 +12,16 @@ CREATE TABLE IF NOT EXISTS users (
 
 CREATE TABLE IF NOT EXISTS posts (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    authorid INT NOT NULL,
+    userid INT NOT NULL,
     name VARCHAR(255) NOT NULL,
     description TEXT NOT NULL,
     rating INT CHECK (rating >= 1 AND rating <= 5),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (authorid) REFERENCES users(id)
+    FOREIGN KEY (userid) REFERENCES users(id)
 );
 
 CREATE TABLE IF NOT EXISTS images_in_posts (
-	id INT AUTO_INCREMENT PRIMARY KEY,
+    id INT AUTO_INCREMENT PRIMARY KEY,
     postid INT NOT NULL,
     picpath VARCHAR(255),
     FOREIGN KEY (postid) REFERENCES posts(id)
@@ -29,23 +29,23 @@ CREATE TABLE IF NOT EXISTS images_in_posts (
     
 CREATE TABLE IF NOT EXISTS comments (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    authorid INT NOT NULL,
+    userid INT NOT NULL,
     postid INT NOT NULL,
     comment TEXT NOT NULL,
     picpath VARCHAR(255),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (authorid) REFERENCES users(id),
+    FOREIGN KEY (userid) REFERENCES users(id),
     FOREIGN KEY (postid) REFERENCES posts(id)
 );
 
 CREATE TABLE IF NOT EXISTS likes (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    authorid INT NOT NULL,
+    userid INT NOT NULL,
     postid INT NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (authorid) REFERENCES users(id),
+    FOREIGN KEY (userid) REFERENCES users(id),
     FOREIGN KEY (postid) REFERENCES posts(id),
-    UNIQUE KEY (authorid, postid)
+    UNIQUE KEY (userid, postid)
 );
 
 CREATE TABLE IF NOT EXISTS chats (
@@ -75,13 +75,8 @@ CREATE TABLE IF NOT EXISTS messages_in_chats (
 );
 
 CREATE TABLE IF NOT EXISTS images_in_messages (
-	id INT AUTO_INCREMENT PRIMARY KEY,
+    id INT AUTO_INCREMENT PRIMARY KEY,
     messageid INT NOT NULL,
     picpath VARCHAR(255),
     FOREIGN KEY (messageid) REFERENCES messages_in_chats(id)
 );
-
-Select * from users;
-
-
-

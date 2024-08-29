@@ -1,56 +1,86 @@
 const pool = require('../config/db');
-jwt = require('jsonwebtoken');
+const jwt = require('jsonwebtoken');
 require('dotenv').config();
-bcrypt = require('bcrypt');
-
+const bcrypt = require('bcrypt');
 
 exports.createUser = async (name, email, password) => {
-    const [result] = await pool.query(
-        'INSERT INTO users (name, email, password, picpath) VALUES (?, ?, ?, ?)',
-        [name, email, password, "https://ui-avatars.com/api/?name=" + name + "&color=121212&background=D1D5DB"]
-    );
-    return result.insertId;
-}
+    try {
+        const [result] = await pool.query(
+            'INSERT INTO users (name, email, password, picpath) VALUES (?, ?, ?, ?)',
+            [name, email, password, `https://ui-avatars.com/api/?name=${name}&color=121212&background=D1D5DB`]
+        );
+        return result.insertId;
+    } catch (error) {
+        throw new Error('Error creating user: ' + error.message);
+    }
+};
 
 exports.getUserByEmail = async (email) => {
-    const [rows] = await pool.query('SELECT * FROM users WHERE email = ?', [email]);
-    return rows[0];
-}
+    try {
+        const [rows] = await pool.query('SELECT * FROM users WHERE email = ?', [email]);
+        return rows[0];
+    } catch (error) {
+        throw new Error('Error fetching user by email: ' + error.message);
+    }
+};
 
 exports.getUserById = async (id) => {
-    const [rows] = await pool.query('SELECT * FROM users WHERE id = ?', [id]);
-    return rows;
+    try {
+        const [rows] = await pool.query('SELECT * FROM users WHERE id = ?', [id]);
+        return rows;
+    } catch (error) {
+        throw new Error('Error fetching user by ID: ' + error.message);
+    }
 };
 
 exports.getUserByName = async (name) => {
-    const [rows] = await pool.query('SELECT * FROM users WHERE name = ?', [name]);
-    return rows;
-}
+    try {
+        const [rows] = await pool.query('SELECT * FROM users WHERE name = ?', [name]);
+        return rows;
+    } catch (error) {
+        throw new Error('Error fetching user by name: ' + error.message);
+    }
+};
 
 exports.getAllUsers = async () => {
-    const [rows] = await pool.query('SELECT * FROM users');
-    return rows;
-}
+    try {
+        const [rows] = await pool.query('SELECT * FROM users');
+        return rows;
+    } catch (error) {
+        throw new Error('Error fetching all users: ' + error.message);
+    }
+};
 
 exports.updateUser = async (id, name, email, password) => {
-    const [result] = await pool.query('UPDATE users SET name = ?, email = ?, password = ? WHERE id = ?', [name, email, password, id]);
-    return result.affectedRows;
-}
+    try {
+        const [result] = await pool.query(
+            'UPDATE users SET name = ?, email = ?, password = ? WHERE id = ?',
+            [name, email, password, id]
+        );
+        return result.affectedRows;
+    } catch (error) {
+        throw new Error('Error updating user: ' + error.message);
+    }
+};
 
 exports.deleteUser = async (id) => {
-    const [result] = await pool.query('DELETE FROM users WHERE id = ?', [id]);
-    return result.affectedRows;
-}
+    try {
+        const [result] = await pool.query('DELETE FROM users WHERE id = ?', [id]);
+        return result.affectedRows;
+    } catch (error) {
+        throw new Error('Error deleting user: ' + error.message);
+    }
+};
 
 exports.verifyPassword = async (password, hashedPassword) => {
     return await bcrypt.compare(password, hashedPassword);
-}
+};
 
 exports.signToken = (id, name, email) => {
     return jwt.sign({ id, name, email }, process.env.JWT_SECRET, {
         expiresIn: '30d',
     });
-}
+};
 
 exports.hashPassword = async (password) => {
     const saltRounds = 10;
@@ -58,9 +88,10 @@ exports.hashPassword = async (password) => {
 };
 
 exports.updateProfileImage = async (id, imagePath) => {
-    const [result] = await pool.query('UPDATE users SET picpath = ? WHERE id = ?', [imagePath, id]);
-    return result
+    try {
+        const [result] = await pool.query('UPDATE users SET picpath = ? WHERE id = ?', [imagePath, id]);
+        return result;
+    } catch (error) {
+        throw new Error('Error updating profile image: ' + error.message);
+    }
 };
-
-
-

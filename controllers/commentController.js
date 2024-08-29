@@ -11,8 +11,8 @@ exports.getAllComments = async (req, res) => {
 exports.createComment = async (req, res) => {
     try {
         const { postid, comment } = req.body;
-        const authorid = await getIdbyToken(req.headers.authorization);
-        const newComment = { authorid, postid, comment, picpath: null };
+        const userid = await getIdbyToken(req.headers.authorization);
+        const newComment = { userid, postid, comment, picpath: null };
         const result = await Comment.createComment(newComment);
         newComment.id = result.insertId;
         res.status(201).json({ newComment });
