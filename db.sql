@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS users (
     email VARCHAR(255) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
     picpath VARCHAR(255) DEFAULT 'uploads/users/default_avatar.jpg',
-    bgpicpath VARCHAR(255),
+    bgpicpath VARCHAR(255) DEFAULT 'uploads/users/default_background.jpg',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -80,3 +80,15 @@ CREATE TABLE IF NOT EXISTS images_in_messages (
     picpath VARCHAR(255),
     FOREIGN KEY (messageid) REFERENCES messages_in_chats(id)
 );
+
+CREATE TABLE IF NOT EXISTS friends (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    friend_id INT NOT NULL,
+    status ENUM('pending', 'confirmed', 'blocked') DEFAULT 'pending',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id),
+    FOREIGN KEY (friend_id) REFERENCES users(id),
+    UNIQUE KEY (user_id, friend_id)
+);
+

@@ -107,3 +107,51 @@ exports.uploadProfileImage = async (req, res) => {
         res.status(500).json({ error: 'Internal server error' });
     }
 };
+
+exports.addFriend = async (req, res) => {
+    const { friendId } = req.body;
+    const userId = getIdbyToken(req.headers.authorization);
+    try {
+        await User.addFriend(userId, friendId);
+        res.status(200).json({ message: 'Friend added successfully' });
+    } catch (error) {
+        console.error('Error adding friend:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+};
+
+exports.acceptFriend = async (req, res) => {
+    const { friendId } = req.body;
+    const userId = getIdbyToken(req.headers.authorization);
+    try {
+        await User.acceptFriend(userId, friendId);
+        res.status(200).json({ message: 'Friend accepted successfully' });
+    } catch (error) {
+        console.error('Error accepting friend:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+};
+
+exports.declineFriend = async (req, res) => {
+    const { friendId } = req.body;
+    const userId = getIdbyToken(req.headers.authorization);
+    try {
+        await User.declineFriend(userId, friendId);
+        res.status(200).json({ message: 'Friend declined successfully' });
+    } catch (error) {
+        console.error('Error declining friend:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+};
+
+exports.removeFriend = async (req, res) => {
+    const { friendId } = req.body;
+    const userId = getIdbyToken(req.headers.authorization);
+    try {
+        await User.removeFriend(userId, friendId);
+        res.status(200).json({ message: 'Friend deleted successfully' });
+    } catch (error) {
+        console.error('Error deleting friend:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+};

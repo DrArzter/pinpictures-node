@@ -3,11 +3,58 @@ const jwt = require('jsonwebtoken');
 require('dotenv').config();
 const bcrypt = require('bcrypt');
 
+exports.removeFriend = async (userId, friendId) => {
+    try {
+        const [result] = await pool.query(
+            'DELETE FROM friends WHERE user_id = ? AND friend_id = ?',
+            [userId, friendId]
+        );
+        return result.affectedRows > 0;
+    } catch (error) {
+        throw new Error('Error removing friend: ' + error.message);
+    }
+};
+
+exports.declineFriend = async (userId, friendId) => {
+    try {
+        const [result] = await pool.query(
+            'DELETE FROM friends WHERE user_id = ? AND friend_id = ?',
+        );
+        return result.affectedRows > 0;
+    } catch (error) {
+        throw new Error('Error declining friend: ' + error.message);
+    }
+};
+
+exports.acceptFriend = async (userId, friendId) => {
+    try {
+        const [result] = await pool.query(
+            'UPDATE friends SET status = ? WHERE user_id = ? AND friend_id = ?',
+            ['accepted', userId, friendId]
+        );
+        return result.affectedRows > 0;
+    } catch (error) {
+        throw new Error('Error confirming friend: ' + error.message);
+    }
+};
+
+exports.addFriend = async (userId, friendId) => {
+    try {
+        const [result] = await pool.query(
+            'INSERT INTO friends (user_id, friend_id, status) VALUES (?, ?, ?)',
+            [userId, friendId, 'pending']
+        );
+        return result.insertId;
+    } catch (error) {
+        throw new Error('Error adding friend: ' + error.message);
+    }
+};
+
 exports.createUser = async (name, email, password) => {
     try {
         const [result] = await pool.query(
-            'INSERT INTO users (name, email, password, picpath) VALUES (?, ?, ?, ?)',
-            [name, email, password, `https://ui-avatars.com/api/?name=${name}&color=121212&background=D1D5DB`]
+            'INSERT INTO users (name, email, password, picpath, bgpicpath) VALUES (?, ?, ?, ?, ?)',
+            [name, email, password, `https://ui-avatars.com/api/?name=${name}&color=121212&background=D1D5DB`, `https://ui-avatars.com/api/?name=${name}&color=121212&background=D1D5DB`]
         );
         return result.insertId;
     } catch (error) {
