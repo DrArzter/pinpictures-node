@@ -40,3 +40,21 @@ exports.searchPosts = async (searchTerm) => {
     const [rows] = await pool.query(queries.SEARCH_POSTS, [likeTerm, likeTerm, likeTerm]);
     return rows;
 };
+
+exports.likePost = async (post) => {
+    try{
+        const [result] = await pool.query('INSERT INTO likes SET ?', post);
+        return result.insertId;
+    } catch (error) {
+        return 0;
+    }
+};
+
+exports.unlikePost = async (id) => {
+    try{
+        const [result] = await pool.query('DELETE FROM likes WHERE userid = ?', [id]);
+        return result.insertId;
+    } catch (error) {
+        return 0;
+    }
+}

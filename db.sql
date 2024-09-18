@@ -24,6 +24,7 @@ CREATE TABLE IF NOT EXISTS images_in_posts (
     id INT AUTO_INCREMENT PRIMARY KEY,
     postid INT NOT NULL,
     picpath VARCHAR(255),
+    bucketkey VARCHAR(255),
     FOREIGN KEY (postid) REFERENCES posts(id)
 );
     
