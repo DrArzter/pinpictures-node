@@ -21,19 +21,37 @@ exports.getPostById = async (id) => {
 };
 
 exports.checkAccessToPost = async (userid, postid) => {
+    console.log(userid, postid);
     const [rows] = await pool.query(queries.CHECK_ACESS_TO_POST, [userid, postid]);
     return rows;
 };
 
 exports.deletePost = async (id) => {
-    const [bucketKeys] = await pool.query("SELECT bucketkey FROM images_in_posts WHERE postid = ?", [id]);
-    const [result2] = await pool.query('DELETE FROM images_in_posts WHERE postid = ?', [id]);
-    const [result3] = await pool.query('DELETE FROM likes WHERE postid = ?', [id]);
-    const [csss] = await pool.query('DELETE FROM comments WHERE postid = ?', [id]);
-    const [result] = await pool.query('DELETE FROM posts WHERE id = ?', [id]);
-    return bucketKeys;
-};
+    const connection = await pool.getConnection();
+    try {
+        await connection.beginTransaction();
 
+        // Получаем ключи изображений
+        const [bucketKeys] = await connection.query("SELECT bucketkey FROM images_in_posts WHERE postid = ?", [id]);
+
+        // Удаляем связанные записи вручную
+        await connection.query('DELETE FROM images_in_posts WHERE postid = ?', [id]);
+        await connection.query('DELETE FROM likes WHERE postid = ?', [id]);
+        await connection.query('DELETE FROM comments WHERE postid = ?', [id]);
+
+        // Удаляем сам пост
+        await connection.query('DELETE FROM posts WHERE id = ?', [id]);
+
+        await connection.commit();
+        return bucketKeys;
+    } catch (error) {
+        await connection.rollback();
+        console.error('Ошибка при удалении поста:', error);
+        throw error;
+    } finally {
+        connection.release();
+    }
+};
 
 
 exports.updatePost = async (id, post) => {

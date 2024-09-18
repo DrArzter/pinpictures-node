@@ -20,19 +20,23 @@ module.exports = (req, res, next) => {
     }
 
     try {
-        userId = getIdbyToken(req.headers.authorization);
-        console.log(userId)
+        userId = getIdbyToken(authHeader);
+
         Post.checkAccessToPost(userId, req.params.id)
             .then((result) => {
-                console.log(result)
-                if (result.length === 0) {
-                    return res.status(404).json({ status: 'error', message: 'Post not found or you are not the owner' });
+                console.log(result);
+                result = result[0]['COUNT(*)'];
+                console.log(result);
+                
+                if (result === 0) {
+                    res.status(404).json({ status: 'error', message: 'Post not found or you are not the owner' });
+                    return;
                 }
+                next();
             })
             .catch((error) => {
                 return res.status(401).json({ status: 'error', message: 'Unauthorized' });
             });
-        next();
     } catch (error) {
         return res.status(401);
     }

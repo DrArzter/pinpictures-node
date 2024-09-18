@@ -125,7 +125,8 @@ exports.deletePost = async (req, res) => {
         const { id } = req.params;
         let bucketKeys = await Post.deletePost(id);
         if (bucketKeys.length === 0) {
-            return res.status(404).json({ status: 'error', message: 'Post not found' });
+           res.status(404).json({ status: 'error', message: 'Post not found' });
+           return;
         }
         
         bucketKeys = bucketKeys.map((key) => key.bucketkey);

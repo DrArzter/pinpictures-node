@@ -1,7 +1,7 @@
 module.exports = {
     CHECK_ACESS_TO_POST: `
         SELECT
-            *
+        COUNT(*)
         FROM 
             posts p
         JOIN 
