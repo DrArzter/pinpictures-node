@@ -1,12 +1,14 @@
 module.exports = {
     CHECK_ACESS_TO_POST: `
         SELECT
-        * 
+            *
         FROM 
-        posts p 
-        JOIN users u ON p.userid = u.id 
-        WHERE userid = ? AND id = ?`,
-        
+            posts p
+        JOIN 
+            users u ON p.userid = u.id
+        WHERE 
+            p.userid = ? AND p.id = ?`,
+
     GET_ALL_POSTS: `
         SELECT 
         p.id, 

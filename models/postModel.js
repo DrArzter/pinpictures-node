@@ -20,6 +20,10 @@ exports.getPostById = async (id) => {
     return rows[0];
 };
 
+exports.checkAccessToPost = async (userid, postid) => {
+    const [rows] = await pool.query(queries.CHECK_ACESS_TO_POST, [userid, postid]);
+    return rows;
+};
 
 exports.deletePost = async (id) => {
     const [bucketKeys] = await pool.query("SELECT bucketkey FROM images_in_posts WHERE postid = ?", [id]);
