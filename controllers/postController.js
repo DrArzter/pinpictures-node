@@ -123,11 +123,11 @@ exports.getPostById = async (req, res) => {
 exports.deletePost = async (req, res) => {
     try {
         const { id } = req.params;
-        const { affectedRows, bucketKeys } = await Post.deletePost(id);
-        if (affectedRows === 0) {
+        const bucketKeys = await Post.deletePost(id);
+        if (bucketKeys.length === 0) {
             return res.status(404).json({ status: 'error', message: 'Post not found' });
         }
-        await deleteFiles(bucketKeys);
+        console.log(await deleteFiles(bucketKeys));
         res.status(200).json({ status: 'success', message: 'Post deleted successfully' });
     } catch (err) {
         handleError(res, err, "Error deleting post");

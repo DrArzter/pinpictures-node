@@ -22,9 +22,12 @@ exports.getPostById = async (id) => {
 
 
 exports.deletePost = async (id) => {
+    const [bucketKeys] = await pool.query("SELECT bucketkey FROM images_in_posts WHERE postid = ?", [id]);
+    const [result2] = await pool.query('DELETE FROM images_in_posts WHERE postid = ?', [id]);
+    const [result3] = await pool.query('DELETE FROM likes WHERE postid = ?', [id]);
+    const [csss] = await pool.query('DELETE FROM comments WHERE postid = ?', [id]);
     const [result] = await pool.query('DELETE FROM posts WHERE id = ?', [id]);
-    const [bucketKeys] = await pool.query("SELECT bucketkey FROM images_in_posts WHERE postid IN (?)", [result.map(post => post.id)]);
-    return result.affectedRows, bucketKeys;
+    return bucketKeys;
 };
 
 

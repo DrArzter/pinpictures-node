@@ -27,11 +27,14 @@ const uploadFiles = function uploadFiles(files) {
     }));
 };
 const deleteFiles = function deleteFiles(paths) {
+    console.log(paths);
     paths.forEach(path => {
         const deleteParams = {
             Bucket: 'pinpictures',
-            Key: path
+            Key: path['bucketkey']
         };
+
+        console.log(deleteParams);
         s3.deleteObject(deleteParams, function(err, data) {
             if (err) {
             } else {
