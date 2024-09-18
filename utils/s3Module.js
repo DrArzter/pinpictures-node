@@ -27,11 +27,10 @@ const uploadFiles = function uploadFiles(files) {
     }));
 };
 const deleteFiles = function deleteFiles(paths) {
-    console.log(paths);
     paths.forEach(path => {
         const deleteParams = {
             Bucket: 'pinpictures',
-            Key: path['bucketkey']
+            Key: path
         };
 
         console.log(deleteParams);

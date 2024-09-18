@@ -4,13 +4,18 @@ const queries = require('./postQueries');
 
 exports.banUser = async (userid) => {
     const [friendsRows] = await pool.query("DELETE IGNORE FROM friends WHERE userid = ?", [userid]);
-
-    const [allPosts] = await pool.query("SELECT * FROM posts WHERE userid = ?", [userid]);
+    let bucketKeys = [];
+    const [allPosts] = await pool.query("SELECT id FROM posts WHERE userid = ?", [userid]);
 
     if (allPosts.length > 0) {
-        const [bucketKeys] = await pool.query("SELECT bucketkey FROM images_in_posts WHERE postid IN (?)", [allPosts.map(post => post.id)]);
+        const [bucketKeysRows] = await pool.query("SELECT bucketkey FROM images_in_posts WHERE postid IN (?)", [allPosts.map(post => post.id)]);
 
-        const [imagesInPostsRows] = await pool.query("DELETE IGNORE FROM images_in_posts WHERE postid IN (?)", [allPosts.map(post => post.id)]);
+        if (bucketKeysRows.length > 0) {
+            bucketKeys = bucketKeysRows.map(row => row.bucketkey);
+
+            await pool.query("DELETE IGNORE FROM images_in_posts WHERE postid IN (?)", [allPosts.map(post => post.id)]);
+
+        }
     }
 
     const [messagesRows] = await pool.query("DELETE IGNORE FROM messages_in_chats WHERE userid = ?", [userid]);
