@@ -1,6 +1,6 @@
 const Post = require('../models/postModel');
 const fs = require('fs').promises;
-const checkToken = require('../utils/getIdbyToken');
+const getIdbyToken = require('../utils/getIdbyToken');
 const { handleError } = require('../utils/errorHandler');
 const { uploadFiles, deleteFiles } = require('../utils/s3Module');
 const { stat } = require('fs');
@@ -28,7 +28,7 @@ exports.createPost = async (req, res) => {
     try {
         const formData = req.body;
         const images = req.files;
-        formData.userid = await checkToken(req.headers.authorization);
+        formData.userid = await getIdbyToken(req.headers.authorization);
 
         console.log(images.length);
         if (images.length > 10) {
@@ -123,15 +123,14 @@ exports.getPostById = async (req, res) => {
 exports.deletePost = async (req, res) => {
     try {
         const { id } = req.params;
-        const bucketKeys = await Post.deletePost(id);
+        let bucketKeys = await Post.deletePost(id);
         if (bucketKeys.length === 0) {
             return res.status(404).json({ status: 'error', message: 'Post not found' });
         }
-        // FIX HERE
-        console.log(bucketKeys);
-        console.log(await deleteFiles(bucketKeys));
-        //STOP MOVING UR HANDS HERE
-
+        
+        bucketKeys = bucketKeys.map((key) => key.bucketkey);
+        deleteFiles(bucketKeys);
+        
         res.status(200).json({ status: 'success', message: 'Post deleted successfully' });
     } catch (err) {
         handleError(res, err, "Error deleting post");
@@ -168,7 +167,7 @@ exports.updateRating = async (req, res) => {
 
 exports.likePost = async (req, res) => {
     try {
-        const id = await checkToken(req.headers.authorization);
+        const id = await getIdbyToken(req.headers.authorization);
         const like = {
             userid: id,
             postid: req.params.id

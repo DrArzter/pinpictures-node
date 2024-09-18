@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const postController = require('../controllers/postController');
 const authMiddleware = require('../middlewares/authMiddleware');
+const ownerMiddleware = require('../middlewares/ownerMiddleware');
 const imageMiddleware = require('../middlewares/imageMiddleware');
 const multer = require('multer');
 
@@ -14,7 +15,7 @@ router.get('/search', postController.searchPosts);
 
 router.get('/id/:id', postController.getPostById);
 
-router.delete('/id/:id', authMiddleware, postController.deletePost);
+router.delete('/id/:id', authMiddleware, ownerMiddleware, postController.deletePost);
 
 router.put('/rating/:id', authMiddleware, postController.updateRating);
 
