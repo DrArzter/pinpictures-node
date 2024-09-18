@@ -123,10 +123,11 @@ exports.getPostById = async (req, res) => {
 exports.deletePost = async (req, res) => {
     try {
         const { id } = req.params;
-        const affectedRows = await Post.deletePost(id);
+        const { affectedRows, bucketKeys } = await Post.deletePost(id);
         if (affectedRows === 0) {
             return res.status(404).json({ status: 'error', message: 'Post not found' });
         }
+        await deleteFiles(bucketKeys);
         res.status(200).json({ status: 'success', message: 'Post deleted successfully' });
     } catch (err) {
         handleError(res, err, "Error deleting post");
@@ -168,25 +169,12 @@ exports.likePost = async (req, res) => {
             userid: id,
             postid: req.params.id
         }
-        const affectedRows = await Post.likePost(like);
-        if (affectedRows === 0) {
+        const result = await Post.likePost(like);
+        if (result === 0) {
             return res.status(400).json({ status: 'error', message: 'Something went wrong' });
         }
-        res.status(200).json({ status: 'success', message: 'Post liked successfully' });
+        res.status(200).json({ status: 'success', message: result === -1 ? 'unliked' : 'liked' });
     } catch (err) {
         handleError(res, err, "Error liking post");
-    }
-}
-
-exports.unlikePost = async (req, res) => {
-    try {
-        const id = await checkToken(req.headers.authorization);
-        const affectedRows = await Post.unlikePost(id);
-        if (affectedRows === 0) {
-            return res.status(400).json({ status: 'error', message: 'Something went wrong' });
-        }
-        res.status(200).json({ status: 'success', message: 'Post unliked successfully' });
-    } catch (err) {
-        handleError(res, err, "Error unliking post");
     }
 }

@@ -3,6 +3,7 @@ USE my_db;
 CREATE TABLE IF NOT EXISTS users (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(255) NOT NULL UNIQUE,
+    bananaLevel INT DEFAULT 0,
     email VARCHAR(255) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
     picpath VARCHAR(255) DEFAULT 'uploads/users/default_avatar.jpg',
@@ -84,12 +85,12 @@ CREATE TABLE IF NOT EXISTS images_in_messages (
 
 CREATE TABLE IF NOT EXISTS friends (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    user_id INT NOT NULL,
-    friend_id INT NOT NULL,
+    userid INT NOT NULL,
+    friendid INT NOT NULL,
     status ENUM('pending', 'confirmed', 'blocked') DEFAULT 'pending',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(id),
-    FOREIGN KEY (friend_id) REFERENCES users(id),
-    UNIQUE KEY (user_id, friend_id)
+    FOREIGN KEY (userid) REFERENCES users(id),
+    FOREIGN KEY (friendid) REFERENCES users(id),
+    UNIQUE KEY (userid, friendid)
 );
 

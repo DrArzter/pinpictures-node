@@ -20,10 +20,14 @@ exports.getPostById = async (id) => {
     return rows[0];
 };
 
+
 exports.deletePost = async (id) => {
     const [result] = await pool.query('DELETE FROM posts WHERE id = ?', [id]);
-    return result.affectedRows;
+    const [bucketKeys] = await pool.query("SELECT bucketkey FROM images_in_posts WHERE postid IN (?)", [result.map(post => post.id)]);
+    return result.affectedRows, bucketKeys;
 };
+
+
 
 exports.updatePost = async (id, post) => {
     const [result] = await pool.query('UPDATE posts SET ? WHERE id = ?', [post, id]);
@@ -43,18 +47,15 @@ exports.searchPosts = async (searchTerm) => {
 
 exports.likePost = async (post) => {
     try{
+        const currentLikeState = (await pool.query('SELECT * FROM likes WHERE userid = ? AND postid = ?', [post.userid, post.postid]))[0].length;
+
+        if (currentLikeState) {
+            await pool.query('DELETE FROM likes WHERE userid = ? AND postid = ?', [post.userid, post.postid]);
+            return -1;
+        }
         const [result] = await pool.query('INSERT INTO likes SET ?', post);
-        return result.insertId;
+        return 1;
     } catch (error) {
         return 0;
     }
 };
-
-exports.unlikePost = async (id) => {
-    try{
-        const [result] = await pool.query('DELETE FROM likes WHERE userid = ?', [id]);
-        return result.insertId;
-    } catch (error) {
-        return 0;
-    }
-}

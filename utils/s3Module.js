@@ -26,19 +26,19 @@ const uploadFiles = function uploadFiles(files) {
             });
     }));
 };
-const deleteFiles = function deleteFiles(path) {
-    const deleteParams = {
-        Bucket: 'pinpictures',
-        Key: path
-    };
-
-    s3.deleteObject(deleteParams, function(err, data) {
-        if (err) {
-            console.error('Error deleting file:', err);
-        } else {
-            console.log('File deleted successfully:', data);
-        }
+const deleteFiles = function deleteFiles(paths) {
+    paths.forEach(path => {
+        const deleteParams = {
+            Bucket: 'pinpictures',
+            Key: path
+        };
+        s3.deleteObject(deleteParams, function(err, data) {
+            if (err) {
+            } else {
+            }
+        });
     });
+    
 }
 
 module.exports = { uploadFiles, deleteFiles }
