@@ -54,7 +54,7 @@ exports.createUser = async (name, email, password) => {
     try {
         const [result] = await pool.query(
             'INSERT INTO users (name, email, password, picpath, bgpicpath) VALUES (?, ?, ?, ?, ?)',
-            [name, email, password, `https://ui-avatars.com/api/?name=${name}&color=121212&background=D1D5DB`, `https://ui-avatars.com/api/?name=${name}&color=121212&background=D1D5DB`]
+            [name, email, password, `https://ui-avatars.com/api/?name=${name}&background=ACACAC&color=fff`, `https://ui-avatars.com/api/?name=${name}&background=ACACAC&color=fff`]
         );
         return result.insertId;
     } catch (error) {
