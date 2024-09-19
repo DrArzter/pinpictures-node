@@ -1,13 +1,14 @@
-const { ValidationError } = require('express-validator');
+const { validationResult } = require('express-validator');
 
 exports.handleError = (res, error, customMessage = 'An error occurred') => {
     console.error('Error:', error);
 
-    if (error instanceof ValidationError) {
+    const validationErrors = validationResult(error);
+    if (!validationErrors.isEmpty()) {
         return res.status(400).json({
             status: 'error',
             message: 'Validation failed',
-            errors: error.array()
+            errors: validationErrors.array()
         });
     }
 
