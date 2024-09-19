@@ -16,8 +16,11 @@ exports.searchPosts = async (req, res) => {
 };
 
 exports.getAllPosts = async (req, res) => {
+
+    const page = parseInt(req.query.page)
+
     try {
-        const posts = await Post.getAllPosts();
+        const posts = await Post.getAllPosts(page);
         res.status(200).json(posts);
     } catch (err) {
         handleError(res, err, "Error retrieving posts");

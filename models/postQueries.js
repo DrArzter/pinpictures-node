@@ -55,7 +55,8 @@ module.exports = {
     JOIN 
         users u ON p.userid = u.id 
     ORDER BY 
-        p.id DESC;
+        p.id DESC
+    LIMIT 40, OFFSET ?;
     `,
 
     GET_POST_BY_ID: `

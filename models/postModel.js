@@ -1,8 +1,8 @@
 const pool = require('../config/db');
 const queries = require('./postQueries');
 
-exports.getAllPosts = async () => {
-    const [rows] = await pool.query(queries.GET_ALL_POSTS);
+exports.getAllPosts = async (page) => {
+    const [rows] = await pool.query(queries.GET_ALL_POSTS(page));
     return rows;
 };
 
