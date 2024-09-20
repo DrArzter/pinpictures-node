@@ -16,11 +16,12 @@ exports.searchPosts = async (req, res) => {
 };
 
 exports.getAllPosts = async (req, res) => {
-
-    const page = parseInt(req.query.page)
+    const { page = 1 } = req.query;
+    const limit = 40;
+    const offset = (page - 1) * limit;
 
     try {
-        const posts = await Post.getAllPosts(page);
+        const posts = await Post.getAllPosts(limit, offset);
         res.status(200).json(posts);
     } catch (err) {
         handleError(res, err, "Error retrieving posts");

@@ -1,10 +1,11 @@
 const pool = require('../config/db');
 const queries = require('./postQueries');
 
-exports.getAllPosts = async (page) => {
-    const [rows] = await pool.query(queries.GET_ALL_POSTS(page));
+exports.getAllPosts = async (limit, offset) => {
+    const [rows] = await pool.query(queries.GET_ALL_POSTS, [limit, offset]);
     return rows;
 };
+
 
 exports.createPost = async (post) => {
     const [result] = await pool.query('INSERT INTO posts SET ?', post);
