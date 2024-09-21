@@ -54,6 +54,8 @@ module.exports = {
                 posts p 
             JOIN 
                 users u ON p.userid = u.id 
+            WHERE
+                u.banned = 0
             ORDER BY 
                 p.id DESC
             LIMIT ? OFFSET ?;
@@ -95,7 +97,8 @@ module.exports = {
         JOIN 
             users u ON p.userid = u.id 
         WHERE
-            p.id = ?
+            p.id = ? AND
+            u.banned = 0
         GROUP BY 
             p.id
         ORDER BY 
@@ -138,9 +141,10 @@ module.exports = {
         JOIN 
             users u ON p.userid = u.id 
         WHERE
-            p.name LIKE ? OR
+            (p.name LIKE ? OR
             p.description LIKE ? OR
-            u.name LIKE ?
+            u.name LIKE ?)
+            AND u.banned = 0
         ORDER BY 
             p.id DESC;
     `,

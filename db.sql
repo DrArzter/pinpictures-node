@@ -3,12 +3,14 @@ USE my_db;
 CREATE TABLE IF NOT EXISTS users (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(255) NOT NULL UNIQUE,
-    bananaLevel INT DEFAULT 0,
+    bananaLevel INT CHECK (bananaLevel >= 0 AND bananaLevel <= 3) DEFAULT 0,
     email VARCHAR(255) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
     picpath VARCHAR(255) DEFAULT 'uploads/users/default_avatar.jpg',
     bgpicpath VARCHAR(255) DEFAULT 'uploads/users/default_background.jpg',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    last_login_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    banned INT CHECK (banned >= 0 AND banned <= 1) DEFAULT 0
 );
 
 CREATE TABLE IF NOT EXISTS posts (
