@@ -83,6 +83,11 @@ module.exports = {
                 WHERE c.postid = p.id
             ) AS comments,
             (
+                SELECT JSON_ARRAYAGG(l.userid)
+                FROM likes l
+                WHERE l.postid = p.id
+            ) AS liked_user_ids,
+            (
                 SELECT JSON_ARRAYAGG(
                     JSON_OBJECT(
                         'id', i.id,
