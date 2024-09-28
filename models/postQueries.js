@@ -83,11 +83,6 @@ module.exports = {
                 WHERE c.postid = p.id
             ) AS comments,
             (
-                SELECT JSON_ARRAYAGG(l.userid)
-                FROM likes l
-                WHERE l.postid = p.id
-            ) AS liked_user_ids,
-            (
                 SELECT JSON_ARRAYAGG(
                     JSON_OBJECT(
                         'id', i.id,
@@ -96,7 +91,17 @@ module.exports = {
                 )
                 FROM images_in_posts i
                 WHERE i.postid = p.id
-            ) AS images
+            ) AS images,
+            (
+                SELECT COUNT(*)
+                FROM likes l
+                WHERE l.postid = p.id
+            ) AS likes,
+            (
+                SELECT JSON_ARRAYAGG(l.userid)
+                FROM likes l
+                WHERE l.postid = p.id
+            ) AS liked_user_ids
         FROM 
             posts p 
         JOIN 
