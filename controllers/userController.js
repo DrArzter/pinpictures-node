@@ -2,6 +2,7 @@ const User = require('../models/userModel');
 const fs = require('fs');
 const path = require('path');
 const getIdbyToken = require('../utils/getIdbyToken');
+const removePassword = require('../utils/removePassword');
 
 exports.register = async (req, res) => {
     const { name, email, password } = req.body;
@@ -30,7 +31,7 @@ exports.login = async (req, res) => {
         if (!name || !password) {
             return res.status(400).json({ message: 'Name and password are required' });
         }
-        const user = (await User.getUserByName(name))[0];
+        const user = (await User.getUserByName(name));
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
         }
@@ -49,11 +50,12 @@ exports.login = async (req, res) => {
 exports.getUser = async (req, res) => {
     const id = req.user.id;
     try {
-        const user = await User.getUserById(id);
-        if (!user.length) {
+        let user = await User.getUserById(id);
+        if (!user) {
             return res.status(404).json({ error: 'User not found' });
         }
-        res.json(user[0]);
+        user = await removePassword(user);
+        res.json(user);
     } catch (error) {
         console.error('Error fetching user:', error);
         res.status(500).json({ error: 'Internal server error' });
@@ -67,7 +69,7 @@ exports.getUserById = async (req, res) => {
         if (!user.length) {
             return res.status(404).json({ error: 'User not found' });
         }
-        res.json(user[0]);
+        res.json(user);
     } catch (error) {
         console.error('Error fetching user by ID:', error);
         res.status(500).json({ error: 'Internal server error' });
@@ -77,11 +79,12 @@ exports.getUserById = async (req, res) => {
 exports.getUserByName = async (req, res) => {
     const { name } = req.params;
     try {
-        const user = await User.getUserByName(name);
-        if (!user.length) {
+        let user = await User.getUserByName(name);
+        if (!user) {
             return res.status(404).json({ error: 'User not found' });
         }
-        res.json(user[0]);
+        user = await removePassword(user);
+        res.json(user);
     } catch (error) {
         console.error('Error fetching user by name:', error);
         res.status(500).json({ error: 'Internal server error' });
@@ -104,6 +107,18 @@ exports.uploadProfileImage = async (req, res) => {
         res.json(updatedUser[0]);
     } catch (error) {
         console.error('Error uploading profile image:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+};
+
+exports.getFriends = async (req, res) => {
+    const { name } = req.params;
+    try {
+        const user = await User.getUserByName(name);
+        const friends = await User.getFriends(user.id);
+        res.json(friends);
+    } catch (error) {
+        console.error('Error getting friends:', error);
         res.status(500).json({ error: 'Internal server error' });
     }
 };

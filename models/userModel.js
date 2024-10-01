@@ -3,10 +3,28 @@ const jwt = require('jsonwebtoken');
 require('dotenv').config();
 const bcrypt = require('bcrypt');
 
+exports.getFriends = async (userId) => {
+    try {
+        const [result] = await pool.query(
+            `SELECT 
+                u.id, u.name, u.email, u.picpath, u.bgpicpath 
+            FROM users u
+            JOIN friendships f ON (u.id = f.user1_id OR u.id = f.user2_id) 
+            WHERE (f.user1_id = ? OR f.user2_id = ?) 
+              AND u.id != ? 
+              AND f.status = ?`,
+            [userId, userId, userId, 'confirmed']
+        );
+        return result;
+    } catch (error) {
+        throw new Error('Error getting friends: ' + error.message);
+    }
+};
+
 exports.removeFriend = async (userId, friendId) => {
     try {
         const [result] = await pool.query(
-            'DELETE FROM friends WHERE user_id = ? AND friend_id = ?',
+            'DELETE FROM friendships WHERE userid = ? AND friendid = ?',
             [userId, friendId]
         );
         return result.affectedRows > 0;
@@ -18,7 +36,7 @@ exports.removeFriend = async (userId, friendId) => {
 exports.declineFriend = async (userId, friendId) => {
     try {
         const [result] = await pool.query(
-            'DELETE FROM friends WHERE user_id = ? AND friend_id = ?',
+            'DELETE FROM friendships WHERE user1_id = ? AND user2_id = ?',
         );
         return result.affectedRows > 0;
     } catch (error) {
@@ -29,7 +47,7 @@ exports.declineFriend = async (userId, friendId) => {
 exports.acceptFriend = async (userId, friendId) => {
     try {
         const [result] = await pool.query(
-            'UPDATE friends SET status = ? WHERE user_id = ? AND friend_id = ?',
+            'UPDATE friendships SET status = ? WHERE user1_id = ? AND user2_id = ?',
             ['accepted', userId, friendId]
         );
         return result.affectedRows > 0;
@@ -41,7 +59,7 @@ exports.acceptFriend = async (userId, friendId) => {
 exports.addFriend = async (userId, friendId) => {
     try {
         const [result] = await pool.query(
-            'INSERT INTO friends (user_id, friend_id, status) VALUES (?, ?, ?)',
+            'INSERT INTO friendships (user1_id, user2_id, status) VALUES (?, ?, ?)',
             [userId, friendId, 'pending']
         );
         return result.insertId;
@@ -62,6 +80,15 @@ exports.createUser = async (name, email, password) => {
     }
 };
 
+exports.getUsersByEmail = async (email) => {
+    try {
+        const [rows] = await pool.query('SELECT * FROM users WHERE email = ?', [email]);
+        return rows[0];
+    } catch (error) {
+        throw new Error('Error fetching user by email: ' + error.message);
+    }
+};
+
 exports.getUserByEmail = async (email) => {
     try {
         const [rows] = await pool.query('SELECT * FROM users WHERE email = ?', [email]);
@@ -71,19 +98,37 @@ exports.getUserByEmail = async (email) => {
     }
 };
 
-exports.getUserById = async (id) => {
+exports.getUsersById = async (id) => {
     try {
         const [rows] = await pool.query('SELECT * FROM users WHERE id = ?', [id]);
         return rows;
     } catch (error) {
+        throw new Error('Error fetching users by ID: ' + error.message);
+    }
+};
+
+exports.getUserById = async (id) => {
+    try {
+        const [rows] = await pool.query('SELECT * FROM users WHERE id = ?', [id]);
+        return rows[0];
+    } catch (error) {
         throw new Error('Error fetching user by ID: ' + error.message);
+    }
+};
+
+exports.getUsersByName = async (name) => {
+    try {
+        const [rows] = await pool.query('SELECT * FROM users WHERE name LIKE ?', [`%${name}%`]);
+        return rows;
+    } catch (error) {
+        throw new Error('Error fetching users by name: ' + error.message);
     }
 };
 
 exports.getUserByName = async (name) => {
     try {
         const [rows] = await pool.query('SELECT * FROM users WHERE name = ?', [name]);
-        return rows;
+        return rows[0];
     } catch (error) {
         throw new Error('Error fetching user by name: ' + error.message);
     }
@@ -91,7 +136,7 @@ exports.getUserByName = async (name) => {
 
 exports.getAllUsers = async () => {
     try {
-        const [rows] = await pool.query('SELECT * FROM users');
+        const [rows] = await pool.query('SELECT * FROM users u');
         return rows;
     } catch (error) {
         throw new Error('Error fetching all users: ' + error.message);
