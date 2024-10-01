@@ -85,14 +85,15 @@ CREATE TABLE IF NOT EXISTS images_in_messages (
     FOREIGN KEY (messageid) REFERENCES messages_in_chats(id)
 );
 
-CREATE TABLE IF NOT EXISTS friends (
+CREATE TABLE IF NOT EXISTS friendships (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    userid INT NOT NULL,
-    friendid INT NOT NULL,
+    user1_id INT NOT NULL,
+    user2_id INT NOT NULL,
     status ENUM('pending', 'confirmed', 'blocked') DEFAULT 'pending',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (userid) REFERENCES users(id),
-    FOREIGN KEY (friendid) REFERENCES users(id),
-    UNIQUE KEY (userid, friendid)
+    FOREIGN KEY (user1_id) REFERENCES users(id),
+    FOREIGN KEY (user2_id) REFERENCES users(id),
+    UNIQUE KEY (user1_id, user2_id),
+    CHECK (user1_id < user2_id)
 );
 
