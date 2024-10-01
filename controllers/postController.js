@@ -7,7 +7,7 @@ const { stat } = require('fs');
 
 exports.searchPosts = async (req, res) => {
     try {
-        const { searchTerm } = req.query;
+        const { searchTerm } = req.params;
         const posts = await Post.searchPosts(searchTerm);
         res.json(posts);
     } catch (error) {
@@ -16,7 +16,7 @@ exports.searchPosts = async (req, res) => {
 };
 
 exports.getAllPosts = async (req, res) => {
-    const { page = 1 } = req.query;
+    const { page = 1 } = req.params;
     const limit = 40;
     const offset = (page - 1) * limit;
 

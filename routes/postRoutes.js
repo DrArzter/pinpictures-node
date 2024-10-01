@@ -4,21 +4,22 @@ const postController = require('../controllers/postController');
 const authMiddleware = require('../middlewares/authMiddleware');
 const ownerMiddleware = require('../middlewares/ownerMiddleware');
 const imageMiddleware = require('../middlewares/imageMiddleware');
+const postValidator = require('../middlewares/validators/postValidator');
+const validator = require('../middlewares/validator');
 const multer = require('multer');
 
 const uploadPost = multer({ dest: 'uploads/posts' });
 
-router.get('/', postController.getAllPosts);
-router.post('/', authMiddleware, uploadPost.array('images', 10), postController.createPost);
+router.get('/:page', validator, postValidator.validateGetAllPosts, postController.getAllPosts);
 
-router.get('/search', postController.searchPosts); 
+router.post('/', validator, postValidator.validateCreatePost, uploadPost.array('images', 10), authMiddleware, postController.createPost);
 
-router.get('/id/:id', postController.getPostById);
+router.get('/id/:id', validator, postController.getPostById);
 
-router.delete('/id/:id', authMiddleware, ownerMiddleware, postController.deletePost);
+router.delete('/id/:id', validator, authMiddleware, ownerMiddleware, postController.deletePost);
 
-router.put('/rating/:id', authMiddleware, postController.updateRating);
+router.put('/rating/:id', validator, authMiddleware, postController.updateRating);
 
-router.post('/like/:id', authMiddleware, postController.likePost);
+router.post('/like/:id', validator, authMiddleware, postController.likePost);
 
 module.exports = router;

@@ -6,7 +6,6 @@ exports.getAllPosts = async (limit, offset) => {
     return rows;
 };
 
-
 exports.createPost = async (post) => {
     const [result] = await pool.query('INSERT INTO posts SET ?', post);
     return result.insertId;
@@ -32,15 +31,12 @@ exports.deletePost = async (id) => {
     try {
         await connection.beginTransaction();
 
-        // Получаем ключи изображений
         const [bucketKeys] = await connection.query("SELECT bucketkey FROM images_in_posts WHERE postid = ?", [id]);
 
-        // Удаляем связанные записи вручную
         await connection.query('DELETE FROM images_in_posts WHERE postid = ?', [id]);
         await connection.query('DELETE FROM likes WHERE postid = ?', [id]);
         await connection.query('DELETE FROM comments WHERE postid = ?', [id]);
 
-        // Удаляем сам пост
         await connection.query('DELETE FROM posts WHERE id = ?', [id]);
 
         await connection.commit();
