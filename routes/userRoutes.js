@@ -13,7 +13,7 @@ router.post('/login', userValidator.validateLogin, validator, userController.log
 
 router.get('/friend/:name', validator, userController.getFriends);
 router.post('/friend', validator, authMiddleware, userController.addFriend);
-router.post('/friend/accept', validator, authMiddleware, userController.acceptFriend);
+router.post('/friend/confirm', validator, authMiddleware, userController.confirmFriend);
 router.post('/friend/decline', validator, authMiddleware, userController.declineFriend);
 router.post('/friend/remove', validator, authMiddleware, userController.removeFriend);
 

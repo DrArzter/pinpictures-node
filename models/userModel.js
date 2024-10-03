@@ -2,18 +2,21 @@ const pool = require('../config/db');
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
 const bcrypt = require('bcrypt');
+const { use } = require('../routes/userRoutes');
 
 exports.getFriends = async (userId) => {
     try {
         const [result] = await pool.query(
             `SELECT 
-                u.id, u.name, u.email, u.picpath, u.bgpicpath 
+                u.id, u.name, u.email, u.picpath, u.bgpicpath,
+                f.status 
             FROM users u
-            JOIN friendships f ON (u.id = f.user1_id OR u.id = f.user2_id) 
-            WHERE (f.user1_id = ? OR f.user2_id = ?) 
-              AND u.id != ? 
-              AND f.status = ?`,
-            [userId, userId, userId, 'confirmed']
+            INNER JOIN friendships f ON (
+                (f.user1_id = ? AND f.user2_id = u.id) OR 
+                (f.user2_id = ? AND f.user1_id = u.id)
+            )
+            WHERE u.id != ?`,
+            [userId, userId, userId] 
         );
         return result;
     } catch (error) {
@@ -24,8 +27,8 @@ exports.getFriends = async (userId) => {
 exports.removeFriend = async (userId, friendId) => {
     try {
         const [result] = await pool.query(
-            'DELETE FROM friendships WHERE userid = ? AND friendid = ?',
-            [userId, friendId]
+            'DELETE FROM friendships WHERE (user1_id = ? AND user2_id = ?) OR (user1_id = ? AND user2_id = ?)',
+            [userId, friendId, userId, friendId]
         );
         return result.affectedRows > 0;
     } catch (error) {
@@ -36,7 +39,8 @@ exports.removeFriend = async (userId, friendId) => {
 exports.declineFriend = async (userId, friendId) => {
     try {
         const [result] = await pool.query(
-            'DELETE FROM friendships WHERE user1_id = ? AND user2_id = ?',
+            'DELETE FROM friendships WHERE (user1_id = ? AND user2_id = ?) OR (user2_id = ? AND user1_id = ?)',
+            [userId, friendId, userId, friendId]
         );
         return result.affectedRows > 0;
     } catch (error) {
@@ -44,11 +48,11 @@ exports.declineFriend = async (userId, friendId) => {
     }
 };
 
-exports.acceptFriend = async (userId, friendId) => {
+exports.confirmFriend = async (userId, friendId) => {
     try {
         const [result] = await pool.query(
-            'UPDATE friendships SET status = ? WHERE user1_id = ? AND user2_id = ?',
-            ['accepted', userId, friendId]
+            'UPDATE friendships SET status = ? WHERE (user1_id = ? AND user2_id = ?) OR (user2_id = ? AND user1_id = ?)',
+            ['confirmed', userId, friendId, userId, friendId]
         );
         return result.affectedRows > 0;
     } catch (error) {

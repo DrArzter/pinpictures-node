@@ -93,7 +93,6 @@ CREATE TABLE IF NOT EXISTS friendships (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user1_id) REFERENCES users(id),
     FOREIGN KEY (user2_id) REFERENCES users(id),
-    UNIQUE KEY (user1_id, user2_id),
-    CHECK (user1_id < user2_id)
+    UNIQUE KEY (user1_id, user2_id)
 );
 

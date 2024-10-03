@@ -18,7 +18,7 @@ exports.register = async (req, res) => {
         const userId = await User.createUser(name, email, hashedPassword);
         const token = User.signToken(userId, name, email);
         const response = await User.getUserById(userId);
-        res.status(201).json({ id: response[0].id, name: response[0].name, email: response[0].email, picpath: response[0].picpath, token });
+        res.status(201).json({ id: response.id, name: response.name, email: response.email, picpath: response.picpath, token });
     } catch (err) {
         console.error('Error in registration:', err);
         res.status(400).json({ message: err.message });
@@ -126,6 +126,7 @@ exports.getFriends = async (req, res) => {
 exports.addFriend = async (req, res) => {
     const { friendId } = req.body;
     const userId = getIdbyToken(req.headers.authorization);
+    console.log(userId, friendId);
     try {
         await User.addFriend(userId, friendId);
         res.status(200).json({ message: 'Friend added successfully' });
@@ -135,11 +136,11 @@ exports.addFriend = async (req, res) => {
     }
 };
 
-exports.acceptFriend = async (req, res) => {
+exports.confirmFriend = async (req, res) => {
     const { friendId } = req.body;
     const userId = getIdbyToken(req.headers.authorization);
     try {
-        await User.acceptFriend(userId, friendId);
+        await User.confirmFriend(userId, friendId);
         res.status(200).json({ message: 'Friend accepted successfully' });
     } catch (error) {
         console.error('Error accepting friend:', error);
