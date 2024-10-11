@@ -3,14 +3,8 @@ const { env } = require('process');
 const jwtSecretKey = env.JWT_SECRET;
 
 module.exports = (req, res, next) => {
-    const authHeader = req.headers.authorization;
+    const token = req.cookies["token"];
     
-    if (!authHeader) {
-        return res.status(401).json({ status: 'error', message: 'Unauthorized' });
-    }
-
-    const token = authHeader.split(' ')[1];
-
     if (!token) {
         return res.status(401).json({ status: 'error', message: 'Unauthorized' });
     }

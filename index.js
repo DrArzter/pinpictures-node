@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
 const morgan = require('morgan');
+const cookieParser = require('cookie-parser');
 
 const { sanitizeInput } = require('./middlewares/sanitizeInput');
 
@@ -10,13 +11,16 @@ const userRoutes = require('./routes/userRoutes');
 const commentRoutes = require('./routes/commentRoutes');
 const chatRoutes = require('./routes/chatRoutes');
 const adminRoutes = require('./routes/adminRoutes');
+const chatWSRoutes = require('./routes/chatWSRoutes');
 const searchRoutes = require('./routes/searchRoutes');
+
 
 dotenv.config();
 
 const app = express();
 
 app.use(morgan('dev'));
+app.use(cookieParser());
 
 app.use('/uploads/posts', express.static('uploads/posts'));
 app.use('/uploads/users', express.static('uploads/users'));
@@ -39,6 +43,7 @@ app.use('/api/comments', commentRoutes);
 app.use('/api/chats', chatRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/search', searchRoutes);
+app.use('/ws/chats', chatWSRoutes);
 
 app.get('/', (req, res) => {
     res.send('Hello, world!');

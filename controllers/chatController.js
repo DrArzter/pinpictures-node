@@ -3,6 +3,7 @@ const Chat = require('../models/chatModel');
 const getIdbyToken = require('../utils/getIdbyToken');
 const getUserByID = require('../utils/getUserById');
 const events = require('events');
+const ws = require('ws');
 
 const emitter = new events.EventEmitter();
 
