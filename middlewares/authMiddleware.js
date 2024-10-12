@@ -3,13 +3,8 @@ const { env } = require('process');
 const jwtSecretKey = env.JWT_SECRET;
 
 module.exports = (req, res, next) => {
-    const authHeader = req.headers.authorization;
-    
-    if (!authHeader) {
-        return res.status(401).json({ status: 'error', message: 'Unauthorized' });
-    }
 
-    const token = authHeader.split(' ')[1];
+    const token = req.cookies["token"];
 
     if (!token) {
         return res.status(401).json({ status: 'error', message: 'Unauthorized' });
@@ -20,6 +15,6 @@ module.exports = (req, res, next) => {
         req.user = decoded;
         next();
     } catch (error) {
-        return res.status(401);
+        return res.status(401).json({ status: 'error', message: 'No such user' });
     }
 };

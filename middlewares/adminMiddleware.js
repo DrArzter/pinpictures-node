@@ -4,13 +4,8 @@ const checkToken = require('../utils/getUserById');
 const jwtSecretKey = env.JWT_SECRET;
 
 module.exports = (req, res, next) => {
-    const authHeader = req.headers.authorization;
 
-    if (!authHeader) {
-        return res.status(401).json({ status: 'error', message: 'Unauthorized' });
-    }
-
-    const token = authHeader.split(' ')[1];
+    const token = req.cookies["token"];
 
     if (!token) {
         return res.status(401).json({ status: 'error', message: 'Unauthorized' });

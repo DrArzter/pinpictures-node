@@ -3,7 +3,6 @@ const fs = require('fs').promises;
 const getIdbyToken = require('../utils/getIdbyToken');
 const { handleError } = require('../utils/errorHandler');
 const { uploadFiles, deleteFiles } = require('../utils/s3Module');
-const { stat } = require('fs');
 
 exports.searchPosts = async (req, res) => {
     try {
@@ -32,9 +31,8 @@ exports.createPost = async (req, res) => {
     try {
         const formData = req.body;
         const images = req.files;
-        formData.userid = await getIdbyToken(req.headers.authorization);
+        formData.userid = await getIdbyToken(req);
 
-        console.log(images.length);
         if (images.length > 10) {
             return res.status(400).json({ status: 'error', message: 'You can only upload up to 10 images' });
         }
@@ -54,8 +52,6 @@ exports.createPost = async (req, res) => {
             return res.status(500).json({ status: 'error', message: 'Failed to create post' });
         }
 
-
-        // Process images and prepare them for upload
         const processedImages = await Promise.all(images.map(async (image) => {
             const filefffTypes = /jpeg|jpg|png|gif|webp/;
             const fileExt = image.originalname.split('.').pop();
@@ -172,7 +168,7 @@ exports.updateRating = async (req, res) => {
 
 exports.likePost = async (req, res) => {
     try {
-        const id = await getIdbyToken(req.headers.authorization);
+        const id = await getIdbyToken(req);
         const like = {
             userid: id,
             postid: req.params.id

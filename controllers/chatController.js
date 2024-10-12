@@ -1,14 +1,12 @@
-const { timeStamp } = require('console');
 const Chat = require('../models/chatModel');
 const getIdbyToken = require('../utils/getIdbyToken');
-const getUserByID = require('../utils/getUserById');
 const events = require('events');
 
 const emitter = new events.EventEmitter();
 
 exports.getChatsByUserId = async (req, res) => {
     try {
-        const userId = await getIdbyToken(req.headers.authorization);
+        const userId = await getIdbyToken(req);
         const chats = await Chat.getChatsByUserIdFromDb(userId);
         res.status(200).json(chats);
     } catch (error) {
@@ -19,7 +17,7 @@ exports.getChatsByUserId = async (req, res) => {
 
 exports.createChat = async (req, res) => {
     try {
-        const user1 = await getIdbyToken(req.headers.authorization);
+        const user1 = await getIdbyToken(req);
         const user2 = req.body.secondUserId;
 
         const chatId = await Chat.createChat({ user1, user2 });
@@ -56,7 +54,7 @@ exports.getMessages = async (req, res) => {
 
 exports.uploadMessage = async (req, res) => {
     try {
-        const userId = await getIdbyToken(req.headers.authorization);
+        const userId = await getIdbyToken(req);
         const chatId  = req.params.id;
         const message = req.body.message.text;
         const uploaded = await Chat.uploadMessage(userId, chatId, message);

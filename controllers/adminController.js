@@ -1,10 +1,5 @@
 const Admin = require('../models/adminModel');
-const fs = require('fs').promises;
-const checkToken = require('../utils/getIdbyToken');
-const { handleError } = require('../utils/errorHandler');
-const { uploadFiles, deleteFiles } = require('../utils/s3Module');
-const { stat } = require('fs');
-const exp = require('constants');
+const { deleteFiles } = require('../utils/s3Module');
 
 exports.banUser = async (req, res) => {
     try {

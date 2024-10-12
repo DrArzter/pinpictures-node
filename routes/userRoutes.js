@@ -11,6 +11,8 @@ const uploadUser = multer({ dest: 'uploads/users' });
 router.post('/register', userValidator.validateRegister, validator, userController.register);
 router.post('/login', userValidator.validateLogin, validator, userController.login);
 
+router.post('/logout', authMiddleware, userController.logout);
+
 router.get('/friend/:name', validator, userController.getFriends);
 router.post('/friend', validator, authMiddleware, userController.addFriend);
 router.post('/friend/confirm', validator, authMiddleware, userController.confirmFriend);

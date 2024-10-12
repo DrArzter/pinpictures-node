@@ -22,7 +22,7 @@ const uploadFiles = function uploadFiles(files) {
                 return data;
             })
             .catch(err => {
-                throw err; // Re-throw error to handle it in the calling function
+                throw err;
             });
     }));
 };

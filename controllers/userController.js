@@ -40,11 +40,17 @@ exports.login = async (req, res) => {
             return res.status(401).json({ message: 'Invalid password' });
         }
         const token = User.signToken(user.id, user.name, user.email);
-        res.status(200).json({ id: user.id, name: user.name, email: user.email, picpath: user.picpath, token });
+        res.cookie('token', token);
+        res.status(200).json({ id: user.id, name: user.name, email: user.email, picpath: user.picpath });
     } catch (err) {
         console.error('Error in login:', err);
         res.status(401).json({ message: err.message });
     }
+};
+
+exports.logout = (req, res) => {
+    res.clearCookie('token');
+    res.status(200).json({ message: 'Logged out successfully' });
 };
 
 exports.getUser = async (req, res) => {
@@ -93,7 +99,7 @@ exports.getUserByName = async (req, res) => {
 
 exports.uploadProfileImage = async (req, res) => {
     const image = req.file;
-    const userId = getIdbyToken(req.headers.authorization);
+    const userId = getIdbyToken(req);
     if (!image) {
         return res.status(400).json({ error: 'No image file provided' });
     }
@@ -125,7 +131,7 @@ exports.getFriends = async (req, res) => {
 
 exports.addFriend = async (req, res) => {
     const { friendId } = req.body;
-    const userId = getIdbyToken(req.headers.authorization);
+    const userId = getIdbyToken(req);
     console.log(userId, friendId);
     try {
         await User.addFriend(userId, friendId);
@@ -138,7 +144,7 @@ exports.addFriend = async (req, res) => {
 
 exports.confirmFriend = async (req, res) => {
     const { friendId } = req.body;
-    const userId = getIdbyToken(req.headers.authorization);
+    const userId = getIdbyToken(req);
     try {
         await User.confirmFriend(userId, friendId);
         res.status(200).json({ message: 'Friend accepted successfully' });
@@ -150,7 +156,7 @@ exports.confirmFriend = async (req, res) => {
 
 exports.declineFriend = async (req, res) => {
     const { friendId } = req.body;
-    const userId = getIdbyToken(req.headers.authorization);
+    const userId = getIdbyToken(req);
     try {
         await User.declineFriend(userId, friendId);
         res.status(200).json({ message: 'Friend declined successfully' });
@@ -162,7 +168,7 @@ exports.declineFriend = async (req, res) => {
 
 exports.removeFriend = async (req, res) => {
     const { friendId } = req.body;
-    const userId = getIdbyToken(req.headers.authorization);
+    const userId = getIdbyToken(req);
     try {
         await User.removeFriend(userId, friendId);
         res.status(200).json({ message: 'Friend deleted successfully' });
