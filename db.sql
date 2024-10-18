@@ -54,8 +54,10 @@ CREATE TABLE IF NOT EXISTS likes (
 
 CREATE TABLE IF NOT EXISTS chats (
     id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) DEFAULT 'Unnamed',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    picpath VARCHAR(255) DEFAULT 'uploads/chats/default_avatar.jpg'
+    picpath VARCHAR(255) DEFAULT 'uploads/chats/default_avatar.jpg',
+    chat_type ENUM('private', 'group') DEFAULT 'private'
 );
 
 CREATE TABLE IF NOT EXISTS users_in_chats (
@@ -63,8 +65,8 @@ CREATE TABLE IF NOT EXISTS users_in_chats (
     userid INT NOT NULL,
     chatid INT NOT NULL,
     joined_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (userid) REFERENCES users(id),
-    FOREIGN KEY (chatid) REFERENCES chats(id),
+    FOREIGN KEY (userid) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (chatid) REFERENCES chats(id) ON DELETE CASCADE,
     UNIQUE KEY (userid, chatid)
 );
 
@@ -74,15 +76,15 @@ CREATE TABLE IF NOT EXISTS messages_in_chats (
     chatid INT NOT NULL,
     message TEXT NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (userid) REFERENCES users(id),
-    FOREIGN KEY (chatid) REFERENCES chats(id)
+    FOREIGN KEY (userid) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (chatid) REFERENCES chats(id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS images_in_messages (
     id INT AUTO_INCREMENT PRIMARY KEY,
     messageid INT NOT NULL,
     picpath VARCHAR(255),
-    FOREIGN KEY (messageid) REFERENCES messages_in_chats(id)
+    FOREIGN KEY (messageid) REFERENCES messages_in_chats(id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS friendships (

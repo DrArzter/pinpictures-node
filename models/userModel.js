@@ -3,6 +3,8 @@ const jwt = require('jsonwebtoken');
 require('dotenv').config();
 const bcrypt = require('bcrypt');
 const { use } = require('../routes/userRoutes');
+const { v4: uuidv4 } = require('uuid');
+
 
 exports.getFriends = async (userId) => {
     try {
@@ -171,6 +173,19 @@ exports.deleteUser = async (id) => {
 exports.verifyPassword = async (password, hashedPassword) => {
     return await bcrypt.compare(password, hashedPassword);
 };
+
+exports.signSessionToken = (id, name, email) => {
+    return jwt.sign(
+        { 
+            id,
+            type: 'temporary',
+            sessionId: uuidv4(),
+        },
+        process.env.JWT_SECRET,
+        { expiresIn: '1h' }
+    );
+};
+
 
 exports.signToken = (id, name, email) => {
     return jwt.sign({ id, name, email }, process.env.JWT_SECRET, {

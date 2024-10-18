@@ -48,7 +48,7 @@ exports.login = async (req, res) => {
     }
 };
 
-exports.logout = (req, res) => {
+exports.logout = (_req, res) => {
     res.clearCookie('token');
     res.status(200).json({ message: 'Logged out successfully' });
 };
@@ -61,7 +61,8 @@ exports.getUser = async (req, res) => {
             return res.status(404).json({ error: 'User not found' });
         }
         user = await removePassword(user);
-        res.json(user);
+        const sessionToken = User.signSessionToken(user.id, user.name, user.email);
+        res.json({ ...user, sessionToken });
     } catch (error) {
         console.error('Error fetching user:', error);
         res.status(500).json({ error: 'Internal server error' });
