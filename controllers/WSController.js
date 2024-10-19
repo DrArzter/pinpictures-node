@@ -44,7 +44,7 @@ async function handleWebSocket(ws, req) {
                         const chatId = await Chat.createChat({ user1, user2 });
                         ws.send(JSON.stringify({ type: 'chatCreated', id: chatId }));
                     } catch (error) {
-                        ws.send(JSON.stringify({ type: 'error', message: `Error creating chat ${error}` }));
+                        ws.send(JSON.stringify({ type: 'notification', message: {message_type: 'error', message:  `Error creating chat` } }));
                     }
                     break;
                 case 'getAllChats':
@@ -53,7 +53,7 @@ async function handleWebSocket(ws, req) {
                         const chats = await Chat.getChatsByUserId(userId);
                         ws.send(JSON.stringify({ type: 'allChats', chats }));
                     } catch (error) {
-                        ws.send(JSON.stringify({ type: 'error', message: 'Error fetching chats' }));
+                        ws.send(JSON.stringify({ type: 'notification', message: {message_type: 'error', message: 'Error fetching chats'} }));
                     }
                     break;
     
@@ -63,14 +63,14 @@ async function handleWebSocket(ws, req) {
                         const isInChat = await Chat.isUserInChat(decoded.id, chatId);
     
                         if (!isInChat) {
-                            ws.send(JSON.stringify({ type: 'error', message: 'Access denied' }));
+                            ws.send(JSON.stringify({ type: 'notification', message: {message_type: 'error', message: 'Access denied'} }));
                             return;
                         }
     
                         const messages = await Chat.getMessagesByChatId(chatId);
                         ws.send(JSON.stringify({ type: 'chatMessages', chatId, messages }));
                     } catch (error) {
-                        ws.send(JSON.stringify({ type: 'error', message: 'Error fetching messages' }));
+                        ws.send(JSON.stringify({ type: 'notification', message: {message_type: 'error', message: 'Error fetching messages'} }));
                     }
                     break;
     
@@ -88,7 +88,7 @@ async function handleWebSocket(ws, req) {
                         // Проверяем, есть ли пользователь в чате
                         const isUserInChat = await Chat.isUserInChat(decoded.id, chatId);
                         if (!isUserInChat) {
-                            ws.send(JSON.stringify({ type: 'error', message: 'Access denied' }));
+                            ws.send(JSON.stringify({ type: 'notification', message: {message_type: 'error', message: 'Access denied'} }));
                             return;
                         }
     
@@ -109,12 +109,12 @@ async function handleWebSocket(ws, req) {
                             }
                         });
                     } catch (error) {
-                        ws.send(JSON.stringify({ type: 'error', message: 'Error sending message' }));
+                        ws.send(JSON.stringify({ type: 'notification', message: {message_type: 'error', message: 'Error sending message'} }));
                     }
                     break;
     
                 default:
-                    ws.send(JSON.stringify({ type: 'error', message: 'Unknown message type' }));
+                    ws.send(JSON.stringify({ type: 'notification', message: {message_type: 'error', message: 'Invalid type'} }));
             }
         });
 
@@ -122,9 +122,9 @@ async function handleWebSocket(ws, req) {
 
     } catch (error) {
         if (error.name === 'TokenExpiredError') {
-            ws.send(JSON.stringify({ type: 'error', message: 'Session expired, please log in again' }));
+            ws.send(JSON.stringify({ type: 'notification', message: {message_type: 'error', message: 'Token expired'} }));
         } else {
-            ws.send(JSON.stringify({ type: 'error', message: 'Invalid token' }));
+            ws.send(JSON.stringify({ type: 'notification', message: {message_type: 'error', message: 'Invalid token'} }));
         }
         ws.close();
     }
