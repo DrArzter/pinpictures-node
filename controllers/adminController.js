@@ -27,6 +27,16 @@ exports.getUsers = async (req, res) => {
     }
 }
 
+exports.getChats = async (req, res) => {
+    try {
+        const chats = await Admin.getChats();
+        res.status(200).json(chats);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+}
+
 exports.getPosts = async (req, res) => {
     try {
         const posts = await Admin.getPosts();

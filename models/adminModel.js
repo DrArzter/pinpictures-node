@@ -75,6 +75,11 @@ exports.getPosts = async () => {
     return { posts, likes, comments };
 }
 
+exports.getChats = async () => {
+    const [rows] = await pool.query("SELECT * FROM chats");
+    return rows;
+}
+
 exports.setBananaLevel = async (bananaLevel, id) => {
     console.log(`UPDATE users SET bananalevel = ${bananaLevel} WHERE id = ${id}`);
     const [rows] = await pool.query("UPDATE users SET bananalevel = ? WHERE id = ?", [bananaLevel, id]);

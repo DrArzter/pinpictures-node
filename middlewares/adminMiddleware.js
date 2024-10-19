@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 const { env } = require('process');
-const checkToken = require('../utils/getUserById');
+const getUserById = require('../utils/getUserById');
 const jwtSecretKey = env.JWT_SECRET;
 
 module.exports = (req, res, next) => {
@@ -15,9 +15,10 @@ module.exports = (req, res, next) => {
         const decoded = jwt.verify(token, jwtSecretKey);
         req.user = decoded;
         let bananaLevel = 0;
-        checkToken(req.user.id)
+        getUserById(req.user.id)
             .then(result => {
-                bananaLevel = result[0].bananaLevel;
+                bananaLevel = result.bananaLevel;
+
                 console.log('Banana level:', bananaLevel);
                 if (bananaLevel < 2) {
                     return res.status(401).json({ status: 'error', message: 'Не твоего банана дело' });

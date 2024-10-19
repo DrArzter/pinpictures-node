@@ -18,7 +18,8 @@ exports.register = async (req, res) => {
         const userId = await User.createUser(name, email, hashedPassword);
         const token = User.signToken(userId, name, email);
         const response = await User.getUserById(userId);
-        res.status(201).json({ id: response.id, name: response.name, email: response.email, picpath: response.picpath, token });
+        res.cookie('token', token);
+        res.status(201).json({ id: response.id, name: response.name, email: response.email, picpath: response.picpath });
     } catch (err) {
         console.error('Error in registration:', err);
         res.status(400).json({ message: err.message });
@@ -40,7 +41,7 @@ exports.login = async (req, res) => {
             return res.status(401).json({ message: 'Invalid password' });
         }
         const token = User.signToken(user.id, user.name, user.email);
-        res.cookie('token', token);
+        res.cookie('token', token, { SameSite: 'none' });
         res.status(200).json({ id: user.id, name: user.name, email: user.email, picpath: user.picpath });
     } catch (err) {
         console.error('Error in login:', err);

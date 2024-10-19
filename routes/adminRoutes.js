@@ -8,6 +8,7 @@ const multer = require('multer');
 router.post('/ban', adminMiddleware, adminController.banUser);
 router.get('/posts', adminMiddleware, adminController.getPosts);
 router.get('/users', adminMiddleware, adminController.getUsers);
+router.get('/chats', adminMiddleware, adminController.getChats);
 
 router.post('/user/:id', authMiddleware, adminController.userAction);
 

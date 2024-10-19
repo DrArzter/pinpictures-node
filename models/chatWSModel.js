@@ -5,14 +5,14 @@ exports.getChatsByUserId = async (userId) => {
         SELECT 
             c.id AS chatId, 
             c.chat_type, 
-            c.name AS chatName, 
-            c.picpath AS chatPic,
+            MAX(c.name) AS chatName, 
+            MAX(c.picpath) AS chatPic,
             -- Определяем отображаемое имя и картинку
-            IF(c.chat_type = 'private', u.name, c.name) AS displayName,
-            IF(c.chat_type = 'private', u.picpath, c.picpath) AS displayPic,
-            m.message, 
-            m.created_at AS messageTimestamp, 
-            ua.name AS messageAuthorName
+            IF(c.chat_type = 'private', MAX(u.name), MAX(c.name)) AS displayName,
+            IF(c.chat_type = 'private', MAX(u.picpath), MAX(c.picpath)) AS displayPic,
+            MAX(m.message) AS message, 
+            MAX(m.created_at) AS messageTimestamp, 
+            MAX(ua.name) AS messageAuthorName
         FROM chats c
         JOIN users_in_chats uc ON c.id = uc.chatid
         LEFT JOIN (
@@ -29,10 +29,13 @@ exports.getChatsByUserId = async (userId) => {
         LEFT JOIN users_in_chats uc2 ON c.id = uc2.chatid AND uc2.userid != ?
         LEFT JOIN users u ON uc2.userid = u.id
         WHERE uc.userid = ?
+        GROUP BY c.id
     `, [userId, userId]);
 
     return rows;
 };
+
+
 
 
 exports.getMessagesByChatId = async (chatId) => {
