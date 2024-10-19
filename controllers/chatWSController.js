@@ -43,52 +43,70 @@ async function handleChats(ws, req, decoded) {
         const data = JSON.parse(message);
 
         switch (data.type) {
-
             case 'getAllChats':
-
-                const userId = decoded.id;
-                const chats = await Chat.getChatsByUserId(userId);
-                ws.send(JSON.stringify({ type: 'allChats', chats }));
+                try {
+                    const userId = decoded.id;
+                    const chats = await Chat.getChatsByUserId(userId);
+                    ws.send(JSON.stringify({ type: 'allChats', chats }));
+                } catch (error) {
+                    ws.send(JSON.stringify({ type: 'error', message: 'Error fetching chats' }));
+                }
                 break;
 
             case 'getChatMessages':
+                try {
+                    const chatId = data.chatId;
+                    const isInChat = await Chat.isUserInChat(decoded.id, chatId);
 
-                const chatId = data.chatId;
-                const isInChat = await Chat.isUserInChat(decoded.id, chatId);
+                    if (!isInChat) {
+                        ws.send(JSON.stringify({ type: 'error', message: 'Access denied' }));
+                        return;
+                    }
 
-                if (!isInChat) {
-                    ws.send(JSON.stringify({ type: 'error', message: 'Access denied' }));
-                    return;
+                    const messages = await Chat.getMessagesByChatId(chatId);
+                    ws.send(JSON.stringify({ type: 'chatMessages', chatId, messages }));
+                } catch (error) {
+                    ws.send(JSON.stringify({ type: 'error', message: 'Error fetching messages' }));
                 }
-
-                const messages = await Chat.getMessagesByChatId(chatId);
-                ws.send(JSON.stringify({ type: 'chatMessages', chatId, messages }));
                 break;
 
             case 'sendMessage':
-
-                const isUserInChat = await Chat.isUserInChat(decoded.id, data.message.chatId);
-                if (!isUserInChat) {
-                    ws.send(JSON.stringify({ type: 'error', message: 'Access denied' }));
-                    return;
-                }
-
-                const savedMessage = await Chat.saveMessage({
-                    chatId: data.message.chatId,
-                    senderId: decoded.id,
-                    message: data.message.message,
-                });
-
-                const usersInChat = await Chat.getUsersInChat(data.message.chatId);
-
-                usersInChat.forEach(userId => {
-                    if (connectedClients[userId]) {
-                        connectedClients[userId].forEach(clientWs => {
-                            clientWs.send(JSON.stringify({ type: 'newMessage', chatId: data.message.chatId, message: savedMessage }));
-                        });
+                try {
+                    const { chatId: inputChatId, recipientId, message } = data.message;
+                    
+                    let chatId = inputChatId;
+                    
+                    // Если chatId не передан, проверяем существование или создаем новый чат
+                    if (!inputChatId) {
+                        chatId = await Chat.getOrCreatePrivateChat(decoded.id, recipientId);
                     }
-                });
-                
+
+                    // Проверяем, есть ли пользователь в чате
+                    const isUserInChat = await Chat.isUserInChat(decoded.id, chatId);
+                    if (!isUserInChat) {
+                        ws.send(JSON.stringify({ type: 'error', message: 'Access denied' }));
+                        return;
+                    }
+
+                    // Сохраняем и отправляем сообщение
+                    const savedMessage = await Chat.saveMessage({
+                        chatId,
+                        senderId: decoded.id,
+                        message: message,
+                    });
+
+                    const usersInChat = await Chat.getUsersInChat(chatId);
+
+                    usersInChat.forEach(userId => {
+                        if (connectedClients[userId]) {
+                            connectedClients[userId].forEach(clientWs => {
+                                clientWs.send(JSON.stringify({ type: 'newMessage', chatId, message: savedMessage }));
+                            });
+                        }
+                    });
+                } catch (error) {
+                    ws.send(JSON.stringify({ type: 'error', message: 'Error sending message' }));
+                }
                 break;
 
             default:
@@ -96,6 +114,5 @@ async function handleChats(ws, req, decoded) {
         }
     });
 }
-
 
 module.exports = { handleWebSocket, emitter };

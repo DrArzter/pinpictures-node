@@ -1,5 +1,36 @@
 const pool = require('../config/db');
 
+exports.getOrCreatePrivateChat = async (userId1, userId2) => {
+
+    const [existingChat] = await pool.query(`
+        SELECT c.id 
+        FROM chats c
+        JOIN users_in_chats uc1 ON c.id = uc1.chatid AND uc1.userid = ?
+        JOIN users_in_chats uc2 ON c.id = uc2.chatid AND uc2.userid = ?
+        WHERE c.chat_type = 'private'
+    `, [userId1, userId2]);
+
+    if (existingChat.length > 0) {
+        return existingChat[0].id;
+    }
+
+    // Если чата нет, создаем новый
+    const [newChat] = await pool.query(`
+        INSERT INTO chats (name, chat_type) 
+        VALUES ('Private Chat', 'private')
+    `);
+
+    const chatId = newChat.insertId;
+
+    await pool.query(`
+        INSERT INTO users_in_chats (userid, chatid)
+        VALUES (?, ?), (?, ?)
+    `, [userId1, chatId, userId2, chatId]);
+
+    return chatId;
+};
+
+// Получаем чаты пользователя по userId
 exports.getChatsByUserId = async (userId) => {
     const [rows] = await pool.query(`
         SELECT 
@@ -35,9 +66,7 @@ exports.getChatsByUserId = async (userId) => {
     return rows;
 };
 
-
-
-
+// Получаем сообщения по chatId
 exports.getMessagesByChatId = async (chatId) => {
     const [rows] = await pool.query(`
         SELECT 
@@ -57,6 +86,7 @@ exports.getMessagesByChatId = async (chatId) => {
     return rows;
 };
 
+// Проверяем, есть ли пользователь в чате
 exports.isUserInChat = async (userId, chatId) => {
     const [rows] = await pool.query(
         'SELECT * FROM users_in_chats WHERE userid = ? AND chatid = ?', 
@@ -65,6 +95,7 @@ exports.isUserInChat = async (userId, chatId) => {
     return rows.length > 0;
 };
 
+// Сохраняем сообщение
 exports.saveMessage = async (message) => {
     const [result] = await pool.query(
         'INSERT INTO messages_in_chats (userid, chatid, message) VALUES (?, ?, ?)', 
@@ -87,6 +118,7 @@ exports.saveMessage = async (message) => {
     return rows[0];
 };
 
+// Получаем пользователей, находящихся в чате
 exports.getUsersInChat = async (chatId) => {
     const [rows] = await pool.query(
         'SELECT userid FROM users_in_chats WHERE chatid = ?', 
