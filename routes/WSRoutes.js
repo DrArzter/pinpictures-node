@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const chatWSController = require('../controllers/chatWSController');
+const chatWSController = require('../controllers/WSController');
 const authMiddleware = require('../middlewares/authMiddleware');
 const WebSocket = require('ws');
 

@@ -9,7 +9,7 @@ const postRoutes = require('./routes/postRoutes');
 const userRoutes = require('./routes/userRoutes');
 const commentRoutes = require('./routes/commentRoutes');
 const chatRoutes = require('./routes/chatRoutes');
-const chatWSRoutes = require('./routes/chatWSRoutes');
+const WSRoutes = require('./routes/WSRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 const searchRoutes = require('./routes/searchRoutes');
 
@@ -42,7 +42,7 @@ app.use('/api/posts', postRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/comments', commentRoutes);
 app.use('/api/chats', chatRoutes);
-app.use('/api/ws/chats', chatWSRoutes);
+app.use('/api/ws/', WSRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/search', searchRoutes);
 
